@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Devvine Dashboard - Workload by Assignee</title>
+<style>
+:root{color-scheme:dark;--bg:#171717;--fg:#fafafa;--card:#1c1c1c;--muted:#242424;--muted-fg:#929292;--border:#2e2e2e;--primary:#3ecf8e;--success:#00c573;--warning:#d5961f;--danger:#f2666d;--info:#7ab8ff;--violet:#8b5cf6;--radius:8px;font-family:Circular,"Helvetica Neue",Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 Circular,"Helvetica Neue",Helvetica,Arial,sans-serif}
+button{font:inherit}
+.page{width:100%;min-height:100vh;padding:24px}
+.header{display:flex;align-items:flex-start;gap:16px;padding-bottom:20px}
+.logo{width:40px;height:40px;border-radius:12px;border:1px solid rgb(62 207 142 / .25);background:rgb(62 207 142 / .1);color:var(--primary);display:grid;place-items:center;flex:0 0 auto}
+.icon{width:18px;height:18px}
+.header h1{font-size:24px;line-height:1.15;margin:0;font-weight:750;letter-spacing:0}
+.header p{margin:4px 0 0;color:var(--muted-fg);font-size:14px}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;background:var(--muted);border-radius:8px;padding:4px}
+.tab{min-height:34px;border-radius:6px;padding:8px 12px;color:var(--muted-fg);font-size:13px;font-weight:650}
+.tab.active{background:var(--bg);color:var(--fg);box-shadow:inset 0 0 0 1px rgb(255 255 255 / .04)}
+.controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.select{height:36px;border:1px solid var(--border);background:var(--card);border-radius:8px;color:var(--fg);padding:0 12px;font-size:12px;display:inline-flex;align-items:center}
+.section{margin-top:16px}
+.section-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin:0 0 10px}
+.section h2{font-size:15px;line-height:1.3;margin:0;font-weight:750;letter-spacing:0}
+.section p{margin:0;color:var(--muted-fg);font-size:12px}
+.grid{display:grid;gap:16px}
+.cards-3{grid-template-columns:1.1fr .9fr .9fr}
+.card{border:1px solid var(--border);background:var(--card);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;transition:border-color .15s,box-shadow .15s,transform .15s;outline:none}
+.card.clickable{cursor:pointer}
+.card.clickable:hover,.card.clickable:focus{border-color:rgb(139 92 246 / .65);box-shadow:0 0 0 1px rgb(139 92 246 / .15);transform:translateY(-1px)}
+.card.wide{grid-column:1/-1}
+.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+.eyebrow{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0;color:var(--muted-fg)}
+.question{margin-top:3px;font-size:12px;font-weight:650;color:rgb(250 250 250 / .74)}
+.card-icon{width:30px;height:30px;border-radius:8px;background:rgb(255 255 255 / .04);border:1px solid rgb(255 255 255 / .06);color:var(--muted-fg);display:grid;place-items:center;flex:0 0 auto}
+.badges,.row{display:flex;gap:6px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;border:1px solid var(--border);background:rgb(255 255 255 / .035);border-radius:999px;padding:3px 7px;color:var(--muted-fg);font-size:10px;font-weight:750;letter-spacing:0}
+.pill.success{color:var(--success);border-color:rgb(0 197 115 / .25);background:rgb(0 197 115 / .09)}
+.pill.warning{color:var(--warning);border-color:rgb(213 150 31 / .25);background:rgb(213 150 31 / .09)}
+.pill.danger{color:var(--danger);border-color:rgb(242 102 109 / .25);background:rgb(242 102 109 / .09)}
+.pill.info{color:var(--info);border-color:rgb(122 184 255 / .25);background:rgb(122 184 255 / .09)}
+.metric{margin:auto 0 10px;text-align:center}
+.metric strong{display:block;font:800 44px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:0;color:var(--danger)}
+.metric span{display:block;margin-top:7px;color:var(--muted-fg);font-size:10px;text-transform:uppercase;letter-spacing:0}
+.stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:4px}
+.stat{border:1px solid rgb(255 255 255 / .08);background:rgb(255 255 255 / .025);border-radius:8px;padding:10px}
+.stat b{display:block;font:800 18px/1.1 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--fg)}
+.stat span{display:block;margin-top:5px;color:var(--muted-fg);font-size:10px;text-transform:uppercase;letter-spacing:0}
+.meter{height:8px;background:rgb(255 255 255 / .06);border-radius:4px;overflow:hidden;margin-top:12px}
+.meter span{display:block;height:100%;background:var(--danger);border-radius:inherit}
+.insight{margin-top:auto;padding-top:14px;border-top:1px solid rgb(255 255 255 / .08)}
+.insight i{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--primary);margin-right:8px}
+.insight b{font-size:10px;text-transform:uppercase;color:rgb(62 207 142 / .8);letter-spacing:0}
+.insight p{margin:5px 0 0;color:rgb(250 250 250 / .9);font-size:12px;line-height:1.45}
+.callout{border:1px solid rgb(242 102 109 / .22);background:rgb(242 102 109 / .06);border-radius:8px;padding:14px}
+.callout h3,.mini h3{font-size:13px;margin:0 0 8px;font-weight:750}
+.callout p,.mini p{margin:0;color:rgb(250 250 250 / .78);font-size:12px}
+.mini{border:1px solid var(--border);background:rgb(255 255 255 / .025);border-radius:8px;padding:14px}
+.action-list{display:grid;gap:12px}
+.action{border:1px solid rgb(255 255 255 / .08);background:rgb(255 255 255 / .025);border-radius:8px;padding:14px}
+.action-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.action h3{margin:0;font-size:14px}
+.action p{margin:8px 0 0;color:rgb(250 250 250 / .82);font-size:12px}
+.rank{font:800 11px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--primary)}
+.evidence-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.issue{border:1px solid var(--border);background:#191919;border-radius:8px;padding:12px}
+.issue h4{margin:0 0 8px;font-size:13px}
+.issue dl{display:grid;grid-template-columns:84px 1fr;gap:5px 8px;margin:0;color:rgb(250 250 250 / .8);font-size:11px}
+.issue dt{color:var(--muted-fg)}
+.issue dd{margin:0;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.table-wrap{width:100%;overflow:auto}
+table{width:100%;border-collapse:collapse;min-width:720px}
+th,td{border-bottom:1px solid rgb(255 255 255 / .08);padding:10px 8px;text-align:left;font-size:12px;white-space:nowrap}
+th{color:var(--muted-fg);font-size:10px;text-transform:uppercase;letter-spacing:0}
+td{color:rgb(250 250 250 / .88)}
+.modal{position:fixed;inset:0;background:rgb(0 0 0 / .58);display:none;justify-content:flex-end;z-index:20}
+.modal.open{display:flex}
+.sheet{width:min(760px,100%);height:100vh;overflow:auto;background:#191919;border-left:1px solid var(--border);padding:20px;box-shadow:-18px 0 60px rgb(0 0 0 / .38)}
+.sheet-head{display:flex;align-items:start;justify-content:space-between;gap:12px;margin-bottom:14px}
+.sheet h2{margin:0;font-size:18px;letter-spacing:0}
+.sheet p{margin:2px 0 0;color:var(--muted-fg);font-size:13px}
+.close{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--fg);cursor:pointer}
+.detail-section{margin-top:14px;border:1px solid var(--border);border-radius:8px;background:rgb(255 255 255 / .025);padding:14px}
+.detail-section h3{margin:0 0 10px;font-size:13px}
+.footer-note{margin-top:24px;color:var(--muted-fg);font-size:11px;text-align:right}
+@media(max-width:1100px){.cards-3{grid-template-columns:1fr}.evidence-grid{grid-template-columns:1fr}.toolbar{align-items:flex-start;flex-direction:column}}
+@media(max-width:680px){.page{padding:16px}.tabs{width:100%}.tab{flex:1;text-align:center}.stat-grid{grid-template-columns:1fr}.sheet{padding:16px}.metric strong{font-size:38px}}
+</style>
+</head>
+<body>
+<main class="page">
+  <header class="header">
+    <div class="logo" aria-hidden="true">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="8" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="15" width="7" height="6" rx="1.5"/></svg>
+    </div>
+    <div>
+      <h1>Dashboard</h1>
+      <p>Engineering metrics - last 7 days</p>
+    </div>
+  </header>
+
+  <nav class="toolbar" aria-label="Dashboard tabs">
+    <div class="tabs">
+      <span class="tab">Overview</span>
+      <span class="tab">Velocity</span>
+      <span class="tab active">People &amp; Teams</span>
+      <span class="tab">Lineage</span>
+      <span class="tab">AI Leverage</span>
+      <span class="tab">CI</span>
+      <span class="tab">Deploy</span>
+    </div>
+    <div class="controls">
+      <span class="select">Scope - amansingh-devvine</span>
+      <span class="select">Window - 7 days</span>
+    </div>
+  </nav>
+
+  <section class="section">
+    <div class="section-head">
+      <div>
+        <h2>People &amp; Teams</h2>
+        <p>One metric card rendered from people.workload_by_assignee with enriched drilldown.</p>
+      </div>
+    </div>
+    <div class="grid cards-3">
+      <article id="workload-card" class="card clickable" tabindex="0" role="button" aria-label="Open workload drilldown">
+        <div class="card-head">
+          <div>
+            <div class="eyebrow">Workload by Assignee</div>
+            <div class="question">Who is carrying risky open work?</div>
+            <div class="badges" style="margin-top:8px">
+              <span class="pill danger">Critical</span>
+              <span class="pill">SPACE</span>
+              <span class="pill info">people.workload_by_assignee</span>
+            </div>
+          </div>
+          <div class="card-icon" aria-hidden="true">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+          </div>
+        </div>
+        <div class="metric">
+          <strong>42</strong>
+          <span>open issues assigned to amansingh-devvine</span>
+        </div>
+        <div class="stat-grid">
+          <div class="stat"><b>3</b><span>blocked</span></div>
+          <div class="stat"><b>1</b><span>overdue</span></div>
+          <div class="stat"><b>3</b><span>high priority</span></div>
+        </div>
+        <div class="meter" aria-hidden="true"><span style="width:100%"></span></div>
+        <div class="insight">
+          <i></i><b>Insight</b>
+          <p>42 open issues, 3 blocked and 1 overdue. Click to inspect action steps and evidence.</p>
+        </div>
+      </article>
+
+      <aside class="callout">
+        <h3>Why this is critical</h3>
+        <p>The current result is driven by blocked_issues=3 and overdue_issues=1. One highest-priority Jira item is overdue, and three in-progress items are blocked.</p>
+      </aside>
+
+      <aside class="mini">
+        <h3>Data quality</h3>
+        <p>Aging coverage is 100%. No missing fields were reported, and the summary payload is sufficient for action.</p>
+        <div class="row" style="margin-top:12px">
+          <span class="pill success">100% coverage</span>
+          <span class="pill success">sufficient</span>
+          <span class="pill warning">LLM partial</span>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div>
+        <h2>Action steps</h2>
+        <p>Same actions that appear inside the drilldown, surfaced here for scanability.</p>
+      </div>
+    </div>
+    <div class="action-list" id="inline-actions"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div>
+        <h2>Snapshot row</h2>
+        <p>Metric row structure used by the card.</p>
+      </div>
+    </div>
+    <div class="card wide">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Assignee</th><th>Open</th><th>Blocked</th><th>Overdue</th><th>High priority</th><th>Avg age</th><th>Max age</th><th>Coverage</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>amansingh-devvine</td><td>42</td><td>3</td><td>1</td><td>3</td><td>16.6d</td><td>85d</td><td>100%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <div class="footer-note">Static dashboard export - dark theme - workload by assignee</div>
+</main>
+
+<div class="modal" id="modal" aria-hidden="true">
+  <aside class="sheet" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+    <div class="sheet-head">
+      <div>
+        <h2 id="drawer-title">Workload by Assignee</h2>
+        <p>Drilldown - people.workload_by_assignee - last 7 days</p>
+      </div>
+      <button class="close" id="modal-close" aria-label="Close">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+    <div id="drawer-body"></div>
+  </aside>
+</div>
+
+<script>
+const metric = {
+  metricKey: "people.workload_by_assignee",
+  assignee: "amansingh-devvine",
+  periodKey: "2026-07-10",
+  computedAt: "2026-07-10T18:21:21.304Z",
+  row: {
+    open_issues: 42,
+    blocked_issues: 3,
+    overdue_issues: 1,
+    high_priority_issues: 3,
+    aging_covered_issues: 42,
+    avg_age_days: 16.6,
+    max_age_days: 85,
+    aging_coverage_pct: 100
+  },
+  summaryPayload: {
+    title: "42 open issues, 3 blocked and 1 overdue",
+    body: "42 open issues, 3 blocked and 1 overdue.",
+    why: "blocked_issues=3, overdue_issues=1",
+    impact: "The current result is driven by blocked_issues=3, overdue_issues=1.",
+    recommendationHtml: "Review the linked evidence before choosing the next action.",
+    quality: { aging_coverage_pct: 100, missingFields: [], sufficient: true },
+    llmStatus: { attempted: true, status: "partial", failureCode: "unsupported_summary_number", latencyMs: 19910, acceptedActions: 2, rejectedActions: 1 },
+    nextActions: [
+      {
+        id: "relationship-action-1",
+        rank: 1,
+        title: "Address Overdue High Priority Work",
+        action: "Resolve the overdue, high priority task SCRUM-528.",
+        why: "SCRUM-528 is In Progress, overdue, and high priority [E4].",
+        target: "SCRUM-528",
+        evidenceRefs: ["E4"],
+        evidenceValues: {
+          E4: { title: "SCRUM-528 needs attention", body: "SCRUM-528 is In Progress, overdue, high priority.", what: "Assigned open-work risk", primary: "amansingh-devvine", affected: ["SCRUM-528"], actors: ["amansingh-devvine"], why: "overdue high priority In Progress / Task", recommendationHtml: "Resolve the highest-risk linked Jira item before taking additional work.", issue_key: "SCRUM-528", status: "In Progress", issue_type: "Task", priority: "Highest", due_date: "2026-07-08", age_days: 1, is_blocked: false, is_overdue: true, is_high_priority: true }
+        }
+      },
+      {
+        id: "relationship-action-2",
+        rank: 2,
+        title: "Resolve Blocked Work",
+        action: "Unblock In Progress items SCRUM-508, SCRUM-509, and SCRUM-542.",
+        why: "Multiple In Progress items are currently blocked [E1, E2, E3].",
+        target: "amansingh-devvine",
+        evidenceRefs: ["E1", "E2", "E3"],
+        evidenceValues: {
+          E1: { title: "SCRUM-508 needs attention", body: "SCRUM-508 is In Progress, blocked.", what: "Assigned open-work risk", primary: "amansingh-devvine", affected: ["SCRUM-508"], actors: ["amansingh-devvine"], why: "blocked In Progress / Subtask", recommendationHtml: "Resolve the highest-risk linked Jira item before taking additional work.", issue_key: "SCRUM-508", status: "In Progress", issue_type: "Subtask", priority: "Medium", due_date: null, age_days: 7, is_blocked: true, is_overdue: false, is_high_priority: false },
+          E2: { title: "SCRUM-509 needs attention", body: "SCRUM-509 is In Progress, blocked.", what: "Assigned open-work risk", primary: "amansingh-devvine", affected: ["SCRUM-509"], actors: ["amansingh-devvine"], why: "blocked In Progress / Subtask", recommendationHtml: "Resolve the highest-risk linked Jira item before taking additional work.", issue_key: "SCRUM-509", status: "In Progress", issue_type: "Subtask", priority: "Medium", due_date: null, age_days: 7, is_blocked: true, is_overdue: false, is_high_priority: false },
+          E3: { title: "SCRUM-542 needs attention", body: "SCRUM-542 is In Progress, blocked.", what: "Assigned open-work risk", primary: "amansingh-devvine", affected: ["SCRUM-542"], actors: ["amansingh-devvine"], why: "blocked In Progress / Task", recommendationHtml: "Resolve the highest-risk linked Jira item before taking additional work.", issue_key: "SCRUM-542", status: "In Progress", issue_type: "Task", priority: "Medium", due_date: null, age_days: 1, is_blocked: true, is_overdue: false, is_high_priority: false }
+        }
+      }
+    ],
+    relationshipFacts: [
+      { alias: "completed_work", metricKey: "people.issues_closed", signal: "2 issues closed", rows: "issues_closed=2, jira_pr_link_coverage_pct=0, jira_deploy_coverage_pct=0" },
+      { alias: "open_pr_queue", metricKey: "flow.wip_open_prs", signal: "8 open PRs, 7 stale over 48h", rows: "open_prs=8, blocked_open_prs=0, stale_48h_prs=7, review_coverage_pct=0" },
+      { alias: "review_requests", metricKey: "people.reviewer_responsiveness", signal: "3 pending requests, p90 response 256 min", rows: "pending_requests=3, avg_pending_age_min=4962, p90_response_min=256" },
+      { alias: "authored_pr_wait", metricKey: "people.author_review_wait", signal: "5 pending PRs, p90 wait 1034 min", rows: "pending_prs=5, avg_pending_age_min=6030, p90_wait_min=1034, eligible_prs=17" }
+    ],
+    additionalEvidence: [
+      { title: "SCRUM-458 needs attention", body: "SCRUM-458 is In Progress, high priority.", what: "Assigned open-work risk", primary: "amansingh-devvine", affected: ["SCRUM-458"], actors: ["amansingh-devvine"], why: "high priority In Progress / Bug", recommendationHtml: "Resolve the highest-risk linked Jira item before taking additional work.", issue_key: "SCRUM-458", status: "In Progress", issue_type: "Bug", priority: "Highest", due_date: null, age_days: 15, is_blocked: false, is_overdue: false, is_high_priority: true }
+    ],
+    gaps: [
+      { alias: "recurring_ci_failures", metricKey: "ci.recurring_root_cause", reason: "no_matching_snapshot" },
+      { alias: "linked_incidents", metricKey: "repeated.incidents", reason: "no_exact_join_match" }
+    ]
+  }
+};
+
+function esc(value) {
+  return String(value ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+}
+
+function flagPills(issue) {
+  const flags = [];
+  if (issue.is_blocked) flags.push('<span class="pill danger">Blocked</span>');
+  if (issue.is_overdue) flags.push('<span class="pill danger">Overdue</span>');
+  if (issue.is_high_priority) flags.push('<span class="pill warning">High priority</span>');
+  if (!flags.length) flags.push('<span class="pill">Open risk</span>');
+  return flags.join("");
+}
+
+function issueCard(issue, ref) {
+  return `
+    <article class="issue">
+      <div class="action-head">
+        <h4>${esc(issue.issue_key || issue.title)}</h4>
+        ${ref ? `<span class="rank">${esc(ref)}</span>` : ""}
+      </div>
+      <div class="row" style="margin:0 0 10px">${flagPills(issue)}</div>
+      <dl>
+        <dt>Status</dt><dd>${esc(issue.status)}</dd>
+        <dt>Type</dt><dd>${esc(issue.issue_type)}</dd>
+        <dt>Priority</dt><dd>${esc(issue.priority)}</dd>
+        <dt>Due date</dt><dd>${esc(issue.due_date || "-")}</dd>
+        <dt>Age</dt><dd>${esc(issue.age_days)} day${Number(issue.age_days) === 1 ? "" : "s"}</dd>
+        <dt>Why</dt><dd>${esc(issue.why)}</dd>
+      </dl>
+      <p style="margin-top:10px;color:rgb(250 250 250 / .78);font-size:12px">${esc(issue.body)}</p>
+      <p style="margin-top:8px;color:var(--muted-fg);font-size:11px">${esc(issue.recommendationHtml)}</p>
+    </article>`;
+}
+
+function actionCard(action) {
+  const evidence = action.evidenceRefs.map(ref => issueCard(action.evidenceValues[ref], ref)).join("");
+  return `
+    <article class="action">
+      <div class="action-head">
+        <div>
+          <div class="rank">ACTION ${action.rank}</div>
+          <h3>${esc(action.title)}</h3>
+        </div>
+        <span class="pill danger">${esc(action.target)}</span>
+      </div>
+      <p><b>Step:</b> ${esc(action.action)}</p>
+      <p><b>Why:</b> ${esc(action.why)}</p>
+      <p><b>Evidence refs:</b> ${esc(action.evidenceRefs.join(", "))}</p>
+      <div class="evidence-grid">${evidence}</div>
+    </article>`;
+}
+
+function renderActions(container) {
+  container.innerHTML = metric.summaryPayload.nextActions.map(actionCard).join("");
+}
+
+function renderDrawer() {
+  const p = metric.summaryPayload;
+  document.getElementById("drawer-body").innerHTML = `
+    <section class="detail-section">
+      <h3>Summary</h3>
+      <div class="stat-grid">
+        <div class="stat"><b>${metric.row.open_issues}</b><span>open issues</span></div>
+        <div class="stat"><b>${metric.row.blocked_issues}</b><span>blocked</span></div>
+        <div class="stat"><b>${metric.row.overdue_issues}</b><span>overdue</span></div>
+        <div class="stat"><b>${metric.row.high_priority_issues}</b><span>high priority</span></div>
+        <div class="stat"><b>${metric.row.avg_age_days}d</b><span>avg age</span></div>
+        <div class="stat"><b>${metric.row.max_age_days}d</b><span>max age</span></div>
+      </div>
+      <p style="margin-top:12px;color:rgb(250 250 250 / .84)">${esc(p.impact)}</p>
+      <div class="row" style="margin-top:12px">
+        <span class="pill danger">severity critical</span>
+        <span class="pill info">period ${esc(metric.periodKey)}</span>
+        <span class="pill">computed ${esc(metric.computedAt)}</span>
+      </div>
+    </section>
+
+    <section class="detail-section">
+      <h3>Action steps with evidence</h3>
+      <div class="action-list">${p.nextActions.map(actionCard).join("")}</div>
+    </section>
+
+    <section class="detail-section">
+      <h3>Additional evidence/context</h3>
+      <div class="evidence-grid">${p.additionalEvidence.map(issue => issueCard(issue, "")).join("")}</div>
+    </section>
+
+    <section class="detail-section">
+      <h3>Related relationship facts</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Alias</th><th>Metric</th><th>Signal</th><th>Rows</th></tr></thead>
+          <tbody>${p.relationshipFacts.map(f => `<tr><td>${esc(f.alias)}</td><td>${esc(f.metricKey)}</td><td>${esc(f.signal)}</td><td>${esc(f.rows)}</td></tr>`).join("")}</tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="detail-section">
+      <h3>Quality, gaps, and LLM status</h3>
+      <div class="row">
+        <span class="pill success">${p.quality.aging_coverage_pct}% aging coverage</span>
+        <span class="pill success">missing fields: ${p.quality.missingFields.length}</span>
+        <span class="pill ${p.quality.sufficient ? "success" : "warning"}">sufficient: ${p.quality.sufficient}</span>
+        <span class="pill warning">llm ${esc(p.llmStatus.status)}</span>
+        <span class="pill">accepted actions ${p.llmStatus.acceptedActions}</span>
+        <span class="pill">rejected actions ${p.llmStatus.rejectedActions}</span>
+      </div>
+      <div class="table-wrap" style="margin-top:12px">
+        <table>
+          <thead><tr><th>Gap alias</th><th>Metric</th><th>Reason</th></tr></thead>
+          <tbody>${p.gaps.map(g => `<tr><td>${esc(g.alias)}</td><td>${esc(g.metricKey)}</td><td>${esc(g.reason)}</td></tr>`).join("")}</tbody>
+        </table>
+      </div>
+    </section>`;
+}
+
+(function(){
+  const modal = document.getElementById("modal");
+  const close = document.getElementById("modal-close");
+  const card = document.getElementById("workload-card");
+  let last = null;
+  renderActions(document.getElementById("inline-actions"));
+  renderDrawer();
+  function openDrawer() {
+    last = document.activeElement;
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
+    close.focus();
+  }
+  function closeDrawer() {
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+    if (last && last.focus) last.focus();
+  }
+  card.addEventListener("click", openDrawer);
+  card.addEventListener("keydown", event => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      openDrawer();
+    }
+  });
+  close.addEventListener("click", closeDrawer);
+  modal.addEventListener("click", event => { if (event.target === modal) closeDrawer(); });
+  document.addEventListener("keydown", event => { if (event.key === "Escape" && modal.classList.contains("open")) closeDrawer(); });
+})();
+</script>
+</body>
+</html>
