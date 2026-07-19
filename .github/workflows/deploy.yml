@@ -30,7 +30,7 @@ jobs:
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dashboard-work-load-by-assignee
+          path: ./jira-data-verification-doc
 
       - id: deployment
         uses: actions/deploy-pages@v4

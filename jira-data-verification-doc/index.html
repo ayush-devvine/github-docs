@@ -1,0 +1,919 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jira IAAP Data Verification Findings</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #18212f;
+      --muted: #647084;
+      --line: #d9dee7;
+      --paper: #f5f7fa;
+      --surface: #ffffff;
+      --charcoal: #202734;
+      --critical: #c83e4d;
+      --critical-bg: #fff1f2;
+      --high: #b45f06;
+      --high-bg: #fff7e8;
+      --mongo: #16815d;
+      --neo: #2768c7;
+      --resolver: #7a4fb3;
+      --jira: #8a4b12;
+      --shadow: #b23a48;
+      --ok: #1c7a52;
+      --code: #eef1f5;
+      --focus: #0f62ce;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+      letter-spacing: 0;
+    }
+
+    button, input { font: inherit; letter-spacing: 0; }
+
+    a { color: inherit; }
+
+    code {
+      padding: 2px 5px;
+      border-radius: 4px;
+      background: var(--code);
+      color: #27364b;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 0.88em;
+      overflow-wrap: anywhere;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      min-height: 64px;
+      padding: 10px 24px;
+      border-bottom: 1px solid #313b4b;
+      background: var(--charcoal);
+      color: white;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      flex: 0 0 auto;
+      place-items: center;
+      border: 1px solid #73819a;
+      border-radius: 50%;
+      background: #111722;
+      color: #dce7fa;
+      font-weight: 800;
+    }
+
+    .brand-title { font-size: 16px; font-weight: 750; }
+    .brand-subtitle { color: #aeb9cb; font-size: 12px; }
+
+    .topbar-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      font-size: 12px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 30px;
+      padding: 5px 9px;
+      border: 1px solid #536177;
+      border-radius: 4px;
+      background: #293345;
+      color: #e7edf7;
+      white-space: nowrap;
+    }
+
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #51c991; }
+    .status-dot.warn { background: #f2ac57; }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      min-height: calc(100vh - 64px);
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 64px;
+      align-self: start;
+      height: calc(100vh - 64px);
+      overflow-y: auto;
+      border-right: 1px solid var(--line);
+      background: #eef1f5;
+      padding: 22px 14px 28px;
+    }
+
+    .sidebar-label {
+      margin: 0 10px 8px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .nav-link {
+      display: grid;
+      grid-template-columns: 30px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 7px;
+      width: 100%;
+      min-height: 40px;
+      margin-bottom: 3px;
+      padding: 7px 9px;
+      border-radius: 5px;
+      color: #354157;
+      text-decoration: none;
+    }
+
+    .nav-link:hover, .nav-link:focus-visible { background: #dfe5ee; outline: none; }
+    .nav-link.active { background: #d8e4f6; color: #174f9b; font-weight: 700; }
+    .nav-index { color: #7a8598; font-family: "SFMono-Regular", Consolas, monospace; font-size: 11px; }
+    .nav-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .nav-severity { width: 8px; height: 8px; border-radius: 50%; background: var(--high); }
+    .nav-severity.critical { background: var(--critical); }
+
+    main {
+      width: min(1500px, 100%);
+      min-width: 0;
+      margin: 0 auto;
+      padding: 38px clamp(22px, 4vw, 58px) 80px;
+    }
+
+    .report-heading {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 28px;
+      padding-bottom: 26px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: #8b3943;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    h1 { max-width: 820px; margin: 0; font-size: 38px; line-height: 1.12; letter-spacing: 0; }
+
+    .lede { max-width: 820px; margin: 14px 0 0; color: #4f5b6e; font-size: 16px; }
+
+    .scope-seal {
+      width: 190px;
+      flex: 0 0 190px;
+      padding: 14px;
+      border: 1px solid #d5a9ae;
+      border-radius: 6px;
+      background: var(--critical-bg);
+      color: #74343b;
+      font-size: 12px;
+    }
+
+    .scope-seal strong { display: block; margin-bottom: 5px; font-size: 13px; }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(120px, 1fr));
+      border-bottom: 1px solid var(--line);
+      background: var(--surface);
+    }
+
+    .metric { min-height: 108px; padding: 20px 16px; border-right: 1px solid var(--line); }
+    .metric:last-child { border-right: 0; }
+    .metric-value { display: block; font-size: 28px; font-weight: 800; line-height: 1; }
+    .metric-label { display: block; margin-top: 8px; color: var(--muted); font-size: 12px; }
+
+    .scope-band {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.55fr);
+      gap: 28px;
+      padding: 28px 0 32px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .scope-band h2, .sources h2 { margin: 0 0 10px; font-size: 19px; }
+    .scope-band p { margin: 7px 0; color: #4d596b; }
+
+    .identity-grid { display: grid; gap: 9px; }
+    .identity-row { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 10px; font-size: 12px; }
+    .identity-row span:first-child { color: var(--muted); }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 24px 0 14px;
+    }
+
+    .filters { display: flex; flex-wrap: wrap; gap: 7px; }
+
+    .filter-button {
+      min-height: 34px;
+      padding: 6px 11px;
+      border: 1px solid #bdc6d3;
+      border-radius: 4px;
+      background: white;
+      color: #39475c;
+      cursor: pointer;
+    }
+
+    .filter-button[aria-pressed="true"] { border-color: #314a70; background: #314a70; color: white; }
+
+    .search {
+      width: min(360px, 100%);
+      min-height: 38px;
+      padding: 8px 11px;
+      border: 1px solid #b8c2d0;
+      border-radius: 4px;
+      background: white;
+      color: var(--ink);
+    }
+
+    .search:focus { border-color: var(--focus); outline: 2px solid #c9ddf8; }
+
+    .finding {
+      padding: 36px 0 44px;
+      border-top: 2px solid #cdd4df;
+      scroll-margin-top: 82px;
+    }
+
+    .finding[hidden] { display: none; }
+
+    .finding-header {
+      display: grid;
+      grid-template-columns: 64px minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: start;
+      margin-bottom: 20px;
+    }
+
+    .finding-number {
+      display: grid;
+      width: 54px;
+      height: 54px;
+      place-items: center;
+      border-radius: 50%;
+      background: #273243;
+      color: white;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .finding h2 { margin: 0; font-size: 24px; line-height: 1.2; }
+    .finding-summary { max-width: 980px; margin: 9px 0 0; color: #4e5a6d; }
+
+    .severity {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 5px 9px;
+      border: 1px solid #d899a0;
+      border-radius: 4px;
+      background: var(--critical-bg);
+      color: #8b2e39;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .severity.high { border-color: #e0bb83; background: var(--high-bg); color: #8a500e; }
+
+    .finding-facts {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1px;
+      margin-bottom: 20px;
+      border: 1px solid var(--line);
+      background: var(--line);
+    }
+
+    .finding-fact { min-height: 82px; padding: 13px 15px; background: var(--surface); }
+    .finding-fact span { display: block; color: var(--muted); font-size: 11px; font-weight: 750; text-transform: uppercase; }
+    .finding-fact strong { display: block; margin-top: 6px; font-size: 14px; line-height: 1.35; overflow-wrap: anywhere; }
+
+    .examples { display: grid; gap: 14px; }
+
+    .example {
+      overflow: hidden;
+      border: 1px solid #cfd6e1;
+      border-radius: 6px;
+      background: var(--surface);
+    }
+
+    .example-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: #fafbfd;
+    }
+
+    .example-title { margin: 0; font-size: 15px; }
+    .example-subtitle { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
+    .example-index { color: #7a8495; font-family: "SFMono-Regular", Consolas, monospace; font-size: 11px; white-space: nowrap; }
+
+    .graph-wrap { overflow-x: auto; border-bottom: 1px solid var(--line); background: #f8fafc; }
+
+    .graph { display: block; width: 100%; min-width: 860px; height: 244px; }
+    .graph .edge { stroke: #55657b; stroke-width: 2.2; }
+    .graph .edge.dashed { stroke-dasharray: 7 6; }
+    .graph .edge.bad { stroke: var(--critical); }
+    .graph .edge-label-bg { fill: #f8fafc; stroke: #ccd5e1; }
+    .graph .edge-label { fill: #3d4b60; font-size: 11px; font-weight: 800; text-anchor: middle; }
+    .graph .node-box { stroke-width: 2; rx: 7; }
+    .graph .node-kind { fill: white; font-size: 10px; font-weight: 800; text-anchor: middle; }
+    .graph .node-title { fill: white; font-size: 13px; font-weight: 800; text-anchor: middle; }
+    .graph .node-detail { fill: #314056; font-size: 11px; text-anchor: middle; }
+    .graph .node-mongo { fill: var(--mongo); stroke: #0d6849; }
+    .graph .node-neo { fill: var(--neo); stroke: #174c9d; }
+    .graph .node-resolver { fill: var(--resolver); stroke: #5d358f; }
+    .graph .node-jira { fill: var(--jira); stroke: #69360b; }
+    .graph .node-shadow { fill: var(--shadow); stroke: #872733; }
+    .graph .node-neutral { fill: #59667a; stroke: #394559; }
+    .graph .node-missing { fill: #ffffff; stroke: var(--critical); stroke-dasharray: 6 4; }
+    .graph .node-missing + .node-kind, .graph .node-missing ~ .node-title { fill: var(--critical); }
+
+    .evidence-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    .evidence-table th, .evidence-table td { padding: 9px 12px; border-bottom: 1px solid #e4e8ee; text-align: left; vertical-align: top; font-size: 12px; overflow-wrap: anywhere; }
+    .evidence-table tr:last-child th, .evidence-table tr:last-child td { border-bottom: 0; }
+    .evidence-table th { width: 190px; color: var(--muted); font-weight: 650; background: #fcfdfe; }
+    .evidence-table td { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; color: #28364a; }
+
+    .sources { padding: 34px 0; border-top: 2px solid #cdd4df; }
+    .source-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 24px; }
+    .source-link { padding: 10px 0; border-bottom: 1px solid var(--line); color: #315b93; overflow-wrap: anywhere; }
+
+    .empty-state { display: none; padding: 60px 20px; text-align: center; color: var(--muted); }
+    .empty-state.visible { display: block; }
+
+    @media (max-width: 1100px) {
+      .metrics { grid-template-columns: repeat(3, minmax(120px, 1fr)); }
+      .metric:nth-child(3) { border-right: 0; }
+      .metric:nth-child(-n+3) { border-bottom: 1px solid var(--line); }
+      .finding-facts { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 820px) {
+      h1 { font-size: 30px; }
+      .topbar { position: static; align-items: flex-start; padding: 12px 16px; }
+      .topbar-meta { display: none; }
+      .shell { display: block; }
+      .sidebar { position: static; height: auto; overflow: visible; border-right: 0; border-bottom: 1px solid var(--line); padding: 10px 12px; }
+      .sidebar-label { display: none; }
+      #finding-nav { display: flex; gap: 5px; overflow-x: auto; }
+      .nav-link { grid-template-columns: auto auto; width: auto; flex: 0 0 auto; margin: 0; }
+      .nav-title { max-width: 160px; }
+      .nav-severity { display: none; }
+      main { padding: 25px 16px 60px; }
+      .report-heading { display: block; }
+      .scope-seal { width: auto; margin-top: 20px; }
+      .scope-band { grid-template-columns: 1fr; }
+      .controls { align-items: stretch; flex-direction: column; }
+      .search { width: 100%; }
+      .finding-header { grid-template-columns: 46px minmax(0, 1fr); }
+      .finding-number { width: 40px; height: 40px; }
+      .finding-header .severity { grid-column: 2; justify-self: start; }
+      .source-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 540px) {
+      .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .metric { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+      .metric:nth-child(2n) { border-right: 0; }
+      .metric:nth-last-child(-n+2) { border-bottom: 0; }
+      .example-header { flex-direction: column; gap: 6px; }
+      .evidence-table th, .evidence-table td { display: block; width: 100%; }
+      .evidence-table th { padding-bottom: 3px; border-bottom: 0; }
+      .evidence-table td { padding-top: 3px; }
+    }
+
+    @media print {
+      body { background: white; }
+      .topbar, .sidebar, .controls { display: none !important; }
+      .shell { display: block; }
+      main { width: 100%; max-width: none; padding: 0; }
+      .finding { break-before: page; }
+      .example { break-inside: avoid; }
+      .graph-wrap { background: white; }
+      .report-heading { padding-top: 0; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">DV</div>
+      <div>
+        <div class="brand-title">Jira IAAP Verification</div>
+        <div class="brand-subtitle">Storage integrity findings</div>
+      </div>
+    </div>
+    <div class="topbar-meta">
+      <span class="status-pill"><span class="status-dot"></span>MongoDB live</span>
+      <span class="status-pill"><span class="status-dot"></span>Neo4j live</span>
+      <span class="status-pill"><span class="status-dot warn"></span>Jira MCP connected; Claude model sign-in pending</span>
+    </div>
+  </header>
+
+  <div class="shell">
+    <aside class="sidebar" aria-label="Report navigation">
+      <p class="sidebar-label">Findings</p>
+      <nav id="finding-nav"></nav>
+    </aside>
+
+    <main>
+      <section id="overview" aria-labelledby="report-title">
+        <div class="report-heading">
+          <div>
+            <p class="eyebrow">Jira data verification report</p>
+            <h1 id="report-title">Jira IAAP adapter storage findings</h1>
+            <p class="lede">Live comparison of the latest Jira integration in MongoDB against resolver identity records and Neo4j graph projections. The report is restricted to observed Jira ingestion, identity, hierarchy, prefix, and relationship behavior.</p>
+          </div>
+          <div class="scope-seal">
+            <strong>Findings only</strong>
+            No remediation, implementation plan, or proposed fix is included.
+          </div>
+        </div>
+
+        <div class="metrics" aria-label="Verification summary">
+          <div class="metric"><span class="metric-value">10</span><span class="metric-label">confirmed findings</span></div>
+          <div class="metric"><span class="metric-value">50</span><span class="metric-label">exact evidence examples</span></div>
+          <div class="metric"><span class="metric-value">1,148</span><span class="metric-label">Neo4j Jira issue nodes</span></div>
+          <div class="metric"><span class="metric-value">388</span><span class="metric-label">UUID placeholder issues</span></div>
+          <div class="metric"><span class="metric-value">251</span><span class="metric-label">duplicated Jira keys</span></div>
+          <div class="metric"><span class="metric-value">166</span><span class="metric-label">duplicated PR endpoint pairs</span></div>
+        </div>
+
+        <div class="scope-band">
+          <div>
+            <h2>Evidence boundary</h2>
+            <p>All IAAP Mongo examples use the newest and only active Jira integration document. Resolver Mongo and Neo4j records do not carry a usable Jira integration ID; those examples are matched by tenant, organization, domain key, anchor ID, and relationship endpoint.</p>
+            <p>Atlassian OAuth for Claude MCP is connected. An MCP data call was not executed because Claude Code itself is not signed into an Anthropic model session. The findings below are based on live read-only MongoDB and Neo4j queries.</p>
+          </div>
+          <div class="identity-grid" aria-label="Scope identifiers">
+            <div class="identity-row"><span>Integration</span><code>INT_20260709081355410016855889333710016</code></div>
+            <div class="identity-row"><span>Tenant</span><code>TNT_20260514102157973016855861702910004</code></div>
+            <div class="identity-row"><span>Organization</span><code>ORG_20260514102157681016855861702910002</code></div>
+            <div class="identity-row"><span>Jira site</span><code>devvine.atlassian.net</code></div>
+            <div class="identity-row"><span>Observed</span><code>2026-07-19 IST</code></div>
+          </div>
+        </div>
+      </section>
+
+      <div class="controls" aria-label="Finding filters">
+        <div class="filters">
+          <button class="filter-button" type="button" data-filter="all" aria-pressed="true">All findings</button>
+          <button class="filter-button" type="button" data-filter="critical" aria-pressed="false">Critical</button>
+          <button class="filter-button" type="button" data-filter="high" aria-pressed="false">High</button>
+        </div>
+        <input id="finding-search" class="search" type="search" placeholder="Filter findings, keys, anchors, relationships" aria-label="Filter findings">
+      </div>
+
+      <div id="findings"></div>
+      <div id="empty-state" class="empty-state">No findings match the current filter.</div>
+
+      <section class="sources" id="sources">
+        <h2>Contract and implementation sources</h2>
+        <div class="source-grid">
+          <a class="source-link" href="dv-iaap/iap-adapter-jira/src/main/java/com/devvine/iaap/adapters/jira/service/JiraSupportedStylesPolicy.java">JiraSupportedStylesPolicy.java - NEXT_GEN-only eligibility</a>
+          <a class="source-link" href="dv-iaap/iap-adapter-jira/src/main/java/com/devvine/iaap/adapters/jira/service/JiraProjectKeyAllowlistServiceImpl.java">JiraProjectKeyAllowlistServiceImpl.java - project-prefix scope</a>
+          <a class="source-link" href="dv-entity-resolver/data-registry/src/main/resources/jq-config/jira-jq-config.yaml">jira-jq-config.yaml - Jira entities, signals, and edges</a>
+          <a class="source-link" href="dv-entity-resolver/data-synthesizer/src/main/java/com/devvine/entity/resolver/datasynthesizer/builder/IssueLinkBuilder.java">IssueLinkBuilder.java - Jira key stitcher path</a>
+          <a class="source-link" href="dv-entity-resolver/entity-resolver-core/src/main/java/com/devvine/entity/resolver/core/services/EntityResolverService.java">EntityResolverService.java - empty-signal anchor creation</a>
+          <a class="source-link" href="dv-entity-resolver/entity-resolver-core/src/main/java/com/devvine/entity/resolver/core/entities/StoredEventExtractionDetails.java">StoredEventExtractionDetails.java - extraction cache identity</a>
+          <a class="source-link" href="docs/superpowers/plans/2026-06-30-jira-issue-jira-sprint-relationship.md">Jira issue-sprint graph relationship contract</a>
+          <a class="source-link" href="graph-docs/integrations/jira.md">Generated Jira graph schema and production profile</a>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const LATEST = "INT_20260709081355410016855889333710016";
+    const GITHUB_INTEGRATION = "INT_20260601135215512016855939452450216";
+    const ORG = "ORG_20260514102157681016855861702910002";
+    const TENANT = "TNT_20260514102157973016855861702910004";
+    const DD_ANCHOR = "ANC_000017820108014690a1e0a1e0a00580325";
+    const BOARD_ANCHOR = "ANC_000017819488853410a2e0a2e0a005772c0";
+
+    const node = (id, kind, title, detail, tone, x, y) => ({ id, kind, title, detail, tone, x, y });
+    const edge = (from, to, label, style = "") => ({ from, to, label, style });
+    const example = (title, subtitle, graph, rows) => ({ title, subtitle, graph, rows });
+
+    const scopedIssues = [
+      { key: "SCRUM-672", jiraId: "15854", summary: "fix(services): handle nullable metric blocks from the Mongo read path", canonical: "ANC_000017844582618970a3d0a3d0a004f108e", shadow: "9b5720f3-4b09-5f2a-9fef-16d896ff398f", pr: "ANC_000017844583069980a3d0a3d0a006d11e9", repo: "devvine-ai/dv-web-frontend", prNumber: "191" },
+      { key: "SCRUM-671", jiraId: "15853", summary: "feat(services): order Services list by ownership (viewer's services first)", canonical: "ANC_000017844568213970a3d0a3d0a004fe0c9", shadow: "1f4cc848-7aa0-536f-94ab-c3e9262cd679", pr: "ANC_000017844568510930a3d0a3d0a006de201", repo: "devvine-ai/dv-web-frontend", prNumber: "190" },
+      { key: "SCRUM-670", jiraId: "15852", summary: "feat(bff): add service-ownership page for Services list ordering", canonical: "ANC_000017844566081710a3d0a3d0a004fd9fc", shadow: "53ab229c-1792-5761-86f9-488e3b3b0b63", pr: "ANC_000017844566396810a3d0a3d0a006ddad3", repo: "devvine-ai/dv-bff", prNumber: "73" },
+      { key: "SCRUM-669", jiraId: "15851", summary: "fix(services): treat empty namespace as no filter so the Services list isn't blank", canonical: "ANC_000017844527365980a3d0a3d0a004f572d", shadow: "08d3d7ce-4986-539e-8221-4ca6a59e26a9", pr: "ANC_000017844527552200a3d0a3d0a006d57b2", repo: "devvine-ai/dv-query-engine", prNumber: "170" },
+      { key: "SCRUM-668", jiraId: "15850", summary: "feat(dashboard): promote Flow efficiency into the Velocity backing-metric tiles", canonical: "ANC_000017844517332690a3d0a3d0a004f3562", shadow: "944b2443-35b4-553d-a96c-25830a89f966", pr: "ANC_000017844517765680a3d0a3d0a006d36d1", repo: "devvine-ai/dv-web-frontend", prNumber: "189" }
+    ];
+
+    const classicEvents = [
+      { key: "DD-1", jiraId: `${LATEST}/DD-1/changelog/bulk-6-10232`, reference: "DD-1:bulk-6-10232" },
+      { key: "DD-10", jiraId: `${LATEST}/DD-10/changelog/bulk-9-10363`, reference: "DD-10:bulk-9-10363" },
+      { key: "DD-11", jiraId: `${LATEST}/DD-11/changelog/bulk-10-10364`, reference: "DD-11:bulk-10-10364" },
+      { key: "DD-12", jiraId: `${LATEST}/DD-12/changelog/bulk-11-10365`, reference: "DD-12:bulk-11-10365" },
+      { key: "DD-13", jiraId: `${LATEST}/DD-13/changelog/bulk-12-10366`, reference: "DD-13:bulk-12-10366" }
+    ];
+
+    const sprintRows = [
+      { id: "1", name: "DevVine-Sprint1", mongoState: "closed", graphState: "closed", mongoIssues: 11, mongoTasks: 7, mongoSubtasks: 4, graphIssues: 28, graphTasks: 18, graphSubtasks: 10, anchor: "ANC_000017819488853690a2e0a2e0a005772c3" },
+      { id: "2", name: "DevVine-Sprint2", mongoState: "closed", graphState: "closed", mongoIssues: 99, mongoTasks: 63, mongoSubtasks: 24, graphIssues: 122, graphTasks: 75, graphSubtasks: 35, anchor: "ANC_000017819488854250a2e0a2e0a005772c6" },
+      { id: "6", name: "DevVine-Sprint6", mongoState: "active", graphState: "closed", mongoIssues: 100, mongoTasks: 35, mongoSubtasks: 38, graphIssues: 143, graphTasks: 47, graphSubtasks: 66, anchor: "ANC_000017819488855010a2e0a2e0a005772cf" },
+      { id: "40", name: "DevVine-Sprint8", mongoState: "closed", graphState: "closed", mongoIssues: 26, mongoTasks: 7, mongoSubtasks: 3, graphIssues: 50, graphTasks: 21, graphSubtasks: 3, anchor: "ANC_000017819488854500a2e0a2e0a005772c9" },
+      { id: "74", name: "DevVine-Sprint-9", mongoState: "closed", graphState: "closed", mongoIssues: 16, mongoTasks: 0, mongoSubtasks: 10, graphIssues: 44, graphTasks: 14, graphSubtasks: 10, anchor: "ANC_000017819488854770a2e0a2e0a005772cc" }
+    ];
+
+    const subtasks = [
+      { key: "SCRUM-642", jiraId: "15727", parent: "SCRUM-581", parentAnchor: "ANC_000017841041546430a3d0a3d0a004e025d", canonical: "ANC_000017842961102460a790a790a004ed9ad", shadow: "63cb2bf6-42e6-5768-a732-557588a972c4", summary: "Shadow-model comparison for composite insights" },
+      { key: "SCRUM-636", jiraId: "15625", parent: "SCRUM-581", parentAnchor: "ANC_000017841041546430a3d0a3d0a004e025d", canonical: "ANC_000017842742051360a790a790a004e00ed", shadow: "8bc59822-0f30-57e5-8db3-e73e6ca81fba", summary: "Peer-comparison baseline for insights" },
+      { key: "SCRUM-631", jiraId: "15620", parent: "SCRUM-581", parentAnchor: "ANC_000017841041546430a3d0a3d0a004e025d", canonical: "ANC_000017842741562130a790a790a004e0005", shadow: "4ae49045-4678-5d81-9730-acb265aa7af9", summary: "LLM-driven insight narration" },
+      { key: "SCRUM-598", jiraId: "15299", parent: "SCRUM-593", parentAnchor: "ANC_000017841170294480a4f0a4f0a004e1879", canonical: "ANC_000017841171647680a4f0a4f0a004e19fb", shadow: "95ea1041-6834-526e-96b5-c5e407d1bd6f", summary: "Enable User Leaf-Grain Computation and Rollups for People Metrics" },
+      { key: "SCRUM-597", jiraId: "15298", parent: "SCRUM-593", parentAnchor: "ANC_000017841170294480a4f0a4f0a004e1879", canonical: "ANC_000017841171166730a4f0a4f0a004e1974", shadow: "7dff4886-770c-5777-abed-741c97a93d00", summary: "Enable User Leaf-Grain Computation and Rollups for Meta, Work, and VCS Metrics" }
+    ];
+
+    const staleEdges = [
+      { issue: "SCRUM-606", issueAnchor: "ANC_000017841855003250a3e0a3e0a004e15dc", placeholder: "false", edgeId: "172a174d-1d5f-50d0-a2aa-d1a394e979db", sourceField: "pr_title", prAnchor: "ANC_000017841901245460a440a440a006c32c1", prNode: "PR_kwDORUDT2s7yaL4V", repo: "devvine-ai/dv-entity-resolver", number: "160", title: "DO-NOT-MERGE-TEST_PR: Jira data verification : label - feature" },
+      { issue: "SCRUM-606", issueAnchor: "bcfa60c9-ccd8-5d1c-b163-1104d79b5086", placeholder: "true", edgeId: "2f66c14e-1c00-5f34-ae64-dccb5a85b9b8", sourceField: "title", prAnchor: "ANC_000017841901245460a440a440a006c32c1", prNode: "PR_kwDORUDT2s7yaL4V", repo: "devvine-ai/dv-entity-resolver", number: "160", title: "DO-NOT-MERGE-TEST_PR: Jira data verification : label - feature" },
+      { issue: "SCRUM-593", issueAnchor: "ANC_000017841170294480a4f0a4f0a004e1879", placeholder: "false", edgeId: "d9fe8e9f-1ab4-59fe-aac9-c6bed7791306", sourceField: "pr_title", prAnchor: "ANC_000017841153691300a4f0a4f0a006c043c", prNode: "PR_kwDORUDT2s7x_-le", repo: "devvine-ai/dv-entity-resolver", number: "153", title: "SCRUM-596: Fix(lead-time-family)-enable lead-time metrics at user leaf grain with supported rollups" },
+      { issue: "SCRUM-593", issueAnchor: "bef15cf9-9e3c-5ad8-8860-c1f945b0b4e3", placeholder: "true", edgeId: "e348e6d4-4827-5270-938b-2ef2f9e3e0bf", sourceField: "title", prAnchor: "ANC_000017841153691300a4f0a4f0a006c043c", prNode: "PR_kwDORUDT2s7x_-le", repo: "devvine-ai/dv-entity-resolver", number: "153", title: "SCRUM-596: Fix(lead-time-family)-enable lead-time metrics at user leaf grain with supported rollups" },
+      { issue: "SCRUM-529", issueAnchor: "ANC_000017835314091690a190a190a004e011c", placeholder: "false", edgeId: "7ba6e63d-bb61-58d1-b5dc-3f98a48d87b0", sourceField: "pr_title", prAnchor: "ANC_000017837576098130a130a130a00670c99", prNode: "PR_kwDOS3d5Kc7we01w", repo: "devvine-ai/dv-bff", number: "66", title: "feat(overview): expose overviewId + per-card drilldown resolver [SCRUM-574]" }
+    ];
+
+    const regexRows = [
+      { key: "AES-256", canonical: "ANC_000017819453300830a2e0a2e0a004e2632", shadow: "c8378256-387c-5095-a024-38e4c434a5be", rel: "IMPLEMENTED_BY", target: "ANC_000017827196539420a360a360a00660059", targetType: "PullRequest", targetName: "dv-iaap PR #169" },
+      { key: "HTTP-404", canonical: "ANC_000017819452919410a2e0a2e0a004e246f", shadow: "f9458a7f-733c-5841-a6e9-6f060d5540de", rel: "REFERENCED_IN", target: "ANC_000017819452920360a2e0a2e0a004e2473", targetType: "Commit", targetName: "dv-iaap a6eb0f99" },
+      { key: "ISO-8601", canonical: "ANC_000017819451102230a2e0a2e0a004e1d30", shadow: "eb7d71c9-b419-558b-92a4-edb3f64a004f", rel: "REFERENCED_IN", target: "ANC_000017819469824620a2e0a2e0a004e65e9", targetType: "Commit", targetName: "dv-commons 88eba862" },
+      { key: "RFC-2119", canonical: "ANC_000017819452919200a2e0a2e0a004e246d", shadow: "860c6e46-d48a-55dc-bfb8-015ea3cb383f", rel: "REFERENCED_IN", target: "ANC_000017819452920360a2e0a2e0a004e2473", targetType: "Commit", targetName: "dv-iaap a6eb0f99" },
+      { key: "AVX-512", canonical: "ANC_000017819459183680a2e0a2e0a004e4298", shadow: "64a19a3b-5256-5fdd-9f82-744c23ed4c8f", rel: "REFERENCED_IN", target: "ANC_000017819472023040a2e0a2e0a004e6d1e", targetType: "Commit", targetName: "dv-helm-charts c7dd52aa" }
+    ];
+
+    const invalidPrefixes = [
+      { prefix: "AC", key: "AC-1", anchor: "ANC_000017841899717590a440a440a006c2c41" },
+      { prefix: "ADR", key: "ADR-009", anchor: "ANC_000017819452798110a2e0a2e0a004e23de" },
+      { prefix: "BUG", key: "BUG-001", anchor: "ANC_000017819455773370a2e0a2e0a004e3142" },
+      { prefix: "PROJ", key: "PROJ-0", anchor: "ANC_000017819455001520a2e0a2e0a004e2d25" },
+      { prefix: "QUERY", key: "QUERY-09", anchor: "ANC_000017819455816960a2e0a2e0a004e3185" }
+    ];
+
+    const emptySignals = [
+      { type: "JIRA_GROUP", anchor: "ANC_000017829068658530a320a320a004e0c62", identifier: "group", domain: "name=null / group_id=null" },
+      { type: "JIRA_PROJECT", anchor: "ANC_000017829068673360a320a320a004e0c84", identifier: "project", domain: "key=null / name=null" },
+      { type: "JIRA_BOARD", anchor: "ANC_000017829078682650a320a320a004e0c92", identifier: "board", domain: "id='null' / name=null" },
+      { type: "JIRA_SPRINT", anchor: "ANC_000017829078686390a320a320a004e0c94", identifier: "sprint", domain: "id='null' / name=null" },
+      { type: "JIRA_ISSUE", anchor: "ANC_000017829131290150a320a320a004e0cef", identifier: "issue", domain: "id='' / key=''" }
+    ];
+
+    const findings = [
+      {
+        id: "classic-project-leakage",
+        severity: "critical",
+        title: "Classic project data crosses the rejection boundary",
+        summary: "The latest integration correctly marks DD as CLASSIC and SKIPPED_UNSUPPORTED_STYLE, but its processed collection still contains 14 DD changelogs, 5 DD comments, and the DD project record. Neo4j retains the DD project node.",
+        facts: [["Mongo invariant", "DD should remain rejected"], ["Observed", "14 CHANGELOG + 5 COMMENT + 1 PROJECT"], ["Graph context", `DD project ${DD_ANCHOR}`]],
+        examples: classicEvents.map(x => example(
+          `${x.key} classic changelog retained`,
+          "Latest Jira integration - processed event in a skipped project",
+          {
+            nodes: [
+              node("event", "MONGO CHANGELOG", x.key, x.reference, "mongo", 140, 105),
+              node("project", "MONGO PROJECT", "DD", "CLASSIC / SKIPPED", "jira", 490, 105),
+              node("graph", "NEO4J PROJECT", "DD", "style=null", "neo", 840, 105)
+            ],
+            edges: [edge("event", "project", "projectKey = DD", "dashed bad"), edge("project", "graph", "key match", "dashed bad")]
+          },
+          [["Jira integration ID", LATEST], ["Mongo collection", "integrations.jira_processed_events"], ["Mongo jiraId", x.jiraId], ["Mongo referenceValue", x.reference], ["Project eligibility", "CLASSIC / SKIPPED_UNSUPPORTED_STYLE"], ["Neo4j project anchor", DD_ANCHOR], ["Neo4j project style", "null"]]
+        ))
+      },
+      {
+        id: "sprint-space-drift",
+        severity: "high",
+        title: "Sprint membership is merged across scope and the Space path is incomplete",
+        summary: "Every sampled latest-integration sprint has more issues in Neo4j than in MongoDB. Sprints reach Board 1 through IN_BOARD, but Board 1 has only location_project_key=SCRUM and no explicit BELONGS_TO edge to the Jira project.",
+        facts: [["Mongo source", "Latest integration sprint membership"], ["Graph path", "ISSUE -HAS_SPRINT-> SPRINT -IN_BOARD-> BOARD"], ["Missing path", "BOARD -BELONGS_TO-> JIRA_PROJECT"]],
+        examples: sprintRows.map(x => example(
+          `${x.name} - ${x.mongoIssues} Mongo issues vs ${x.graphIssues} graph issues`,
+          `Sprint ${x.id}; Mongo state ${x.mongoState}; graph state ${x.graphState}`,
+          {
+            nodes: [
+              node("issues", "JIRA_ISSUE", `${x.graphIssues} nodes`, `${x.graphTasks} Task / ${x.graphSubtasks} Subtask`, "neo", 100, 105),
+              node("sprint", "JIRA_SPRINT", x.name, `id=${x.id}`, "neo", 370, 105),
+              node("board", "JIRA_BOARD", "Board 1", "project key SCRUM", "neo", 640, 105),
+              node("project", "JIRA_PROJECT", "SCRUM", "no incoming board edge", "missing", 900, 105)
+            ],
+            edges: [edge("issues", "sprint", "HAS_SPRINT"), edge("sprint", "board", "IN_BOARD"), edge("board", "project", "NO BELONGS_TO", "dashed bad")]
+          },
+          [["Jira integration ID", LATEST], ["Sprint ID", x.id], ["Sprint anchor", x.anchor], ["Mongo membership", `${x.mongoIssues} issues; ${x.mongoTasks} Task; ${x.mongoSubtasks} Subtask`], ["Neo4j membership", `${x.graphIssues} issues; ${x.graphTasks} Task; ${x.graphSubtasks} Subtask`], ["Membership delta", `+${x.graphIssues - x.mongoIssues} graph issues`], ["State comparison", `Mongo=${x.mongoState}; Neo4j=${x.graphState}`], ["Board anchor", BOARD_ANCHOR], ["Board to project relationship", "absent"]]
+        ))
+      },
+      {
+        id: "subtask-tag-loss",
+        severity: "high",
+        title: "Subtask tags and parent links are lost on UUID shadow nodes",
+        summary: "MongoDB and the canonical ANC node agree that these five issues are Subtasks at hierarchy level -1. A second placeholder node exists for the same key with issue_type_name=null and no HAS_PARENT relationship.",
+        facts: [["Mongo type", "Subtask / subtask=true / hierarchy=-1"], ["Canonical graph", "Subtask + HAS_PARENT"], ["Shadow graph", "type=null + no parent edge"]],
+        examples: subtasks.map(x => example(
+          `${x.key} loses classification on its shadow node`,
+          `${x.summary}; parent ${x.parent}`,
+          {
+            nodes: [
+              node("mongo", "MONGO ISSUE", x.key, "Subtask / -1", "mongo", 90, 105),
+              node("canonical", "NEO4J ISSUE", x.key, "Subtask", "neo", 350, 65),
+              node("parent", "JIRA_ISSUE", x.parent, "parent", "neo", 650, 65),
+              node("shadow", "PLACEHOLDER", x.key, "type=null", "shadow", 650, 175)
+            ],
+            edges: [edge("mongo", "canonical", "same key", "dashed"), edge("canonical", "parent", "HAS_PARENT"), edge("mongo", "shadow", "same key", "dashed bad")]
+          },
+          [["Jira integration ID", LATEST], ["Mongo jiraId", x.jiraId], ["Mongo issue type", "Subtask; subtask=true; hierarchyLevel=-1"], ["Mongo parent key", x.parent], ["Canonical issue anchor", x.canonical], ["Canonical graph type", "Subtask"], ["Parent anchor", x.parentAnchor], ["Canonical relationship", `(${x.key})-[:HAS_PARENT]->(${x.parent})`], ["Shadow issue anchor", x.shadow], ["Shadow type / parent", "null / none"]]
+        ))
+      },
+      {
+        id: "resolver-bypass",
+        severity: "critical",
+        title: "Stitched UUID nodes bypass resolver identity records",
+        summary: "Each latest Mongo issue resolves to one canonical ANC anchor with three aliases, while a second UUID node is written to Neo4j with no entity_anchors document and no entity_aliases record.",
+        facts: [["Canonical path", "1 anchor doc + 3 aliases"], ["Stitched path", "0 anchor docs + 0 aliases"], ["Observed form", "Raw UUID placeholder in Neo4j"]],
+        examples: scopedIssues.map(x => example(
+          `${x.key} has a resolver-backed ANC node and an unregistered UUID node`,
+          x.summary,
+          {
+            nodes: [
+              node("mongo", "MONGO ISSUE", x.key, `jiraId=${x.jiraId}`, "mongo", 100, 105),
+              node("resolver", "RESOLVER MONGO", "Canonical anchor", "1 doc / 3 aliases", "resolver", 390, 55),
+              node("canonical", "NEO4J ISSUE", x.key, "resolved=true", "neo", 710, 55),
+              node("shadow", "NEO4J SHADOW", x.key, "no resolver record", "shadow", 710, 175)
+            ],
+            edges: [edge("mongo", "resolver", "resolved", "dashed"), edge("resolver", "canonical", "anchor_id", "dashed"), edge("mongo", "shadow", "stitched UUID", "dashed bad")]
+          },
+          [["Jira integration ID", LATEST], ["Mongo processed records", "1"], ["Canonical anchor", x.canonical], ["Canonical entity_anchors docs", "1"], ["Canonical entity_aliases docs", "3"], ["Shadow UUID anchor", x.shadow], ["Shadow entity_anchors docs", "0"], ["Shadow entity_aliases docs", "0"]]
+        ))
+      },
+      {
+        id: "duplicate-jira-issues",
+        severity: "critical",
+        title: "One Jira issue key materializes as two graph nodes",
+        summary: "The latest processed collection contains exactly one record for each sampled key. Neo4j contains both a canonical ANC issue node and a placeholder UUID issue node. Across the graph, 251 keys are duplicated and account for 252 extra nodes.",
+        facts: [["Latest Mongo", "1 processed record per key"], ["Neo4j", "Canonical ANC + placeholder UUID"], ["Graph total", "251 duplicated keys"]],
+        examples: scopedIssues.map(x => example(
+          `${x.key} is duplicated in Neo4j`,
+          `jiraId ${x.jiraId}; one Mongo record; two graph nodes`,
+          {
+            nodes: [
+              node("mongo", "MONGO ISSUE", x.key, "1 current document", "mongo", 130, 105),
+              node("canonical", "CANONICAL ISSUE", x.key, "ANC / resolved", "neo", 500, 55),
+              node("shadow", "PLACEHOLDER ISSUE", x.key, "UUID / placeholder", "shadow", 500, 175)
+            ],
+            edges: [edge("mongo", "canonical", "key + jiraId", "dashed"), edge("mongo", "shadow", "same key", "dashed bad")]
+          },
+          [["Jira integration ID", LATEST], ["Mongo jiraId", x.jiraId], ["Mongo document count", "1"], ["Canonical anchor", x.canonical], ["Canonical resolved_by_resolver", "true"], ["Placeholder anchor", x.shadow], ["Placeholder flag", "true"], ["Graph nodes for key", "2"]]
+        ))
+      },
+      {
+        id: "implemented-by-title-drift",
+        severity: "critical",
+        title: "PR title updates leave stale IMPLEMENTED_BY edges",
+        summary: "The current PullRequest titles no longer contain the old Jira key, but the old title-derived IMPLEMENTED_BY relationships remain. Canonical and placeholder issue paths create separate edge native IDs to the same PR endpoint.",
+        facts: [["Relationship", "JIRA_ISSUE -IMPLEMENTED_BY-> PullRequest"], ["Evidence", "Current Mongo PR title differs from stored Jira edge key"], ["Edge identity", "Separate native_id per issue anchor"]],
+        examples: staleEdges.map(x => example(
+          `${x.issue} still IMPLEMENTED_BY ${x.repo}#${x.number}`,
+          `Current title: ${x.title}`,
+          {
+            nodes: [
+              node("issue", x.placeholder === "true" ? "PLACEHOLDER ISSUE" : "JIRA_ISSUE", x.issue, x.placeholder === "true" ? "UUID" : "canonical ANC", x.placeholder === "true" ? "shadow" : "neo", 180, 105),
+              node("pr", "PULL REQUEST", `#${x.number}`, x.repo, "neo", 700, 105)
+            ],
+            edges: [edge("issue", "pr", "IMPLEMENTED_BY", "bad")]
+          },
+          [["Latest Jira integration ID", LATEST], ["GitHub integration ID", GITHUB_INTEGRATION], ["Issue key", x.issue], ["Issue anchor", x.issueAnchor], ["Issue placeholder", x.placeholder], ["Relationship native_id", x.edgeId], ["Relationship source_field", x.sourceField], ["PR anchor", x.prAnchor], ["PR node_id", x.prNode], ["Current PR", `${x.repo}#${x.number}`], ["Current Mongo PR title", x.title]]
+        ))
+      },
+      {
+        id: "regex-false-positives",
+        severity: "critical",
+        title: "Jira key regex creates false-positive issue nodes and relationships",
+        summary: "Technical tokens that are not Jira issues become canonical resolver anchors and UUID placeholders, then receive graph relationships to commits or pull requests. None exists as an issue in the latest Jira processed collection.",
+        facts: [["Latest Jira Mongo", "0 issue documents for all five keys"], ["Resolver", "GITHUB jira_issue_key hard signal"], ["Neo4j", "Canonical + placeholder with real outgoing edges"]],
+        examples: regexRows.map(x => example(
+          `${x.key} parsed as a Jira issue`,
+          `Both issue nodes connect to ${x.targetName}`,
+          {
+            nodes: [
+              node("canonical", "JIRA_ISSUE", x.key, "canonical ANC", "neo", 150, 55),
+              node("shadow", "PLACEHOLDER", x.key, "UUID shadow", "shadow", 150, 175),
+              node("target", x.targetType.toUpperCase(), x.targetName, "GitHub target", "neo", 690, 105)
+            ],
+            edges: [edge("canonical", "target", x.rel, "bad"), edge("shadow", "target", x.rel, "bad")]
+          },
+          [["Latest Jira integration ID", LATEST], ["Latest Jira issue documents", "0"], ["False-positive key", x.key], ["Canonical resolver anchor", x.canonical], ["Canonical soft signals", "[]"], ["Placeholder UUID anchor", x.shadow], ["Neo4j relationship", `(${x.key})-[:${x.rel}]->(${x.targetType})`], ["Target anchor", x.target], ["Target", x.targetName], ["Graph integration_id", "null"]]
+        ))
+      },
+      {
+        id: "project-prefix-scope",
+        severity: "high",
+        title: "Project-prefix and integration scope is not enforced at graph write",
+        summary: "The latest project set is MDS and SCRUM as active NEXT_GEN, with DD skipped. Neo4j still contains 295 issue nodes outside those active prefixes, and every issue node has integration_id=null. These five keys have zero latest Jira documents.",
+        facts: [["Latest active prefixes", "MDS, SCRUM"], ["Skipped prefix", "DD"], ["Graph outside active prefixes", "295 nodes"]],
+        examples: invalidPrefixes.map(x => example(
+          `${x.key} exists outside the latest project scope`,
+          `Prefix ${x.prefix} is absent from current Jira projects`,
+          {
+            nodes: [
+              node("scope", "MONGO PROJECTS", "MDS / SCRUM", "active NEXT_GEN", "mongo", 170, 105),
+              node("missing", "MONGO ISSUE", x.key, "0 documents", "missing", 500, 105),
+              node("graph", "NEO4J ISSUE", x.key, "integration_id=null", "neo", 820, 105)
+            ],
+            edges: [edge("scope", "missing", "prefix absent", "dashed bad"), edge("missing", "graph", "graph-only node", "dashed bad")]
+          },
+          [["Latest Jira integration ID", LATEST], ["Latest project keys", "DD (skipped), MDS (active), SCRUM (active)"], ["Invalid prefix", x.prefix], ["Issue key", x.key], ["Latest Mongo issue documents", "0"], ["Neo4j issue anchor", x.anchor], ["Neo4j resolved_by_resolver", "true"], ["Neo4j integration_id", "null"]]
+        ))
+      },
+      {
+        id: "integration-id-loss",
+        severity: "critical",
+        title: "Jira integration identity is not propagated into Neo4j",
+        summary: "The latest Mongo records carry the exact integration ID, but both canonical and placeholder graph nodes have integration_id=null. This is true for all 1,148 Jira issue nodes, preventing reliable per-integration graph verification.",
+        facts: [["Mongo property", `integrationId=${LATEST}`], ["Graph property", "integration_id=null"], ["Affected", "1,148 of 1,148 Jira issue nodes"]],
+        examples: scopedIssues.map(x => example(
+          `${x.key} loses integration identity at graph projection`,
+          `Mongo ${LATEST}; Neo4j null`,
+          {
+            nodes: [
+              node("mongo", "MONGO ISSUE", x.key, "integrationId present", "mongo", 160, 105),
+              node("canonical", "CANONICAL ISSUE", x.key, "integration_id=null", "neo", 520, 55),
+              node("shadow", "PLACEHOLDER ISSUE", x.key, "integration_id=null", "shadow", 520, 175)
+            ],
+            edges: [edge("mongo", "canonical", "same jiraId/key", "dashed bad"), edge("mongo", "shadow", "same key", "dashed bad")]
+          },
+          [["Mongo collection", "integrations.jira_processed_events"], ["Mongo integrationId", LATEST], ["Mongo jiraId", x.jiraId], ["Issue key", x.key], ["Canonical anchor", x.canonical], ["Canonical integration_id", "null"], ["Placeholder anchor", x.shadow], ["Placeholder integration_id", "null"]]
+        ))
+      },
+      {
+        id: "empty-signals-persisted",
+        severity: "critical",
+        title: "Entities with empty hard and soft signals still reach Neo4j",
+        summary: "Resolver MongoDB contains 31 active Jira anchors with hardSignals=[] and softSignals=[]. These five diverse anchors are also present in Neo4j with resolved_by_resolver=true, missing domain identity, no integration ID, and degree zero.",
+        facts: [["Resolver total", "31 empty-signal Jira anchors"], ["Mongo state", "active=true"], ["Neo4j state", "resolved_by_resolver=true; degree=0"]],
+        examples: emptySignals.map(x => example(
+          `${x.type} persisted without identity signals`,
+          x.domain,
+          {
+            nodes: [
+              node("resolver", "RESOLVER MONGO", x.type, "hard=[] / soft=[]", "resolver", 190, 105),
+              node("graph", "NEO4J NODE", x.type, x.domain, "neo", 690, 105)
+            ],
+            edges: [edge("resolver", "graph", "same anchor_id", "dashed bad")]
+          },
+          [["Resolver Mongo collection", "entity-resolver.entity_anchors"], ["Anchor ID", x.anchor], ["Entity type", x.type], ["Identity key", "null"], ["Hard signals", "[]"], ["Soft signals", "[]"], ["Mongo active", "true"], ["Neo4j identifier", x.identifier], ["Neo4j domain identity", x.domain], ["Neo4j resolved_by_resolver", "true"], ["Neo4j integration_id", "null"], ["Neo4j degree", "0"]]
+        ))
+      }
+    ];
+
+    if (findings.length !== 10 || findings.some(f => f.examples.length !== 5)) {
+      throw new Error("Report evidence invariant failed: expected 10 findings with exactly 5 examples each.");
+    }
+
+    const escapeHtml = value => String(value ?? "").replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char]));
+
+    function renderGraph(graph, graphId) {
+      const byId = Object.fromEntries(graph.nodes.map(n => [n.id, n]));
+      const lines = graph.edges.map((e, index) => {
+        const from = byId[e.from];
+        const to = byId[e.to];
+        const x1 = from.x + 82;
+        const x2 = to.x - 82;
+        const y1 = from.y;
+        const y2 = to.y;
+        const mx = (x1 + x2) / 2;
+        const my = (y1 + y2) / 2;
+        const labelWidth = Math.max(82, e.label.length * 7 + 18);
+        return `
+          <line class="edge ${escapeHtml(e.style)}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" marker-end="url(#arrow-${graphId})"></line>
+          <rect class="edge-label-bg" x="${mx - labelWidth / 2}" y="${my - 26}" width="${labelWidth}" height="20" rx="4"></rect>
+          <text class="edge-label" x="${mx}" y="${my - 12}">${escapeHtml(e.label)}</text>`;
+      }).join("");
+
+      const nodes = graph.nodes.map(n => {
+        const missing = n.tone === "missing";
+        const boxClass = missing ? "node-missing" : `node-${n.tone}`;
+        const textColor = missing ? ` style="fill:${getComputedStyle(document.documentElement).getPropertyValue('--critical')}"` : "";
+        const title = n.title.length > 24 ? `${n.title.slice(0, 22)}...` : n.title;
+        const detail = n.detail.length > 28 ? `${n.detail.slice(0, 26)}...` : n.detail;
+        return `
+          <g transform="translate(${n.x} ${n.y})">
+            <rect class="node-box ${boxClass}" x="-82" y="-37" width="164" height="74"></rect>
+            <text class="node-kind"${textColor} y="-15">${escapeHtml(n.kind)}</text>
+            <text class="node-title"${textColor} y="9">${escapeHtml(title)}</text>
+            <text class="node-detail" x="0" y="58">${escapeHtml(detail)}</text>
+          </g>`;
+      }).join("");
+
+      return `<div class="graph-wrap"><svg class="graph" viewBox="0 0 1000 244" role="img" aria-label="Evidence relationship graph">
+        <defs><marker id="arrow-${graphId}" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 Z" fill="#55657b"></path></marker></defs>
+        ${lines}${nodes}
+      </svg></div>`;
+    }
+
+    function renderExample(ex, findingIndex, exampleIndex) {
+      const rows = ex.rows.map(([label, value]) => `<tr><th scope="row">${escapeHtml(label)}</th><td>${escapeHtml(value)}</td></tr>`).join("");
+      return `<article class="example">
+        <header class="example-header">
+          <div><h3 class="example-title">${escapeHtml(ex.title)}</h3><p class="example-subtitle">${escapeHtml(ex.subtitle)}</p></div>
+          <span class="example-index">Example ${exampleIndex + 1} of 5</span>
+        </header>
+        ${renderGraph(ex.graph, `${findingIndex}-${exampleIndex}`)}
+        <table class="evidence-table"><tbody>${rows}</tbody></table>
+      </article>`;
+    }
+
+    function renderFinding(finding, index) {
+      const facts = finding.facts.map(([label, value]) => `<div class="finding-fact"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join("");
+      const examples = finding.examples.map((ex, exampleIndex) => renderExample(ex, index, exampleIndex)).join("");
+      return `<section class="finding" id="${escapeHtml(finding.id)}" data-severity="${escapeHtml(finding.severity)}" data-search="${escapeHtml(JSON.stringify(finding).toLowerCase())}">
+        <header class="finding-header">
+          <div class="finding-number">F${String(index + 1).padStart(2, "0")}</div>
+          <div><h2>${escapeHtml(finding.title)}</h2><p class="finding-summary">${escapeHtml(finding.summary)}</p></div>
+          <span class="severity ${finding.severity === "high" ? "high" : ""}">${escapeHtml(finding.severity)}</span>
+        </header>
+        <div class="finding-facts">${facts}</div>
+        <div class="examples">${examples}</div>
+      </section>`;
+    }
+
+    document.getElementById("findings").innerHTML = findings.map(renderFinding).join("");
+    document.getElementById("finding-nav").innerHTML = findings.map((finding, index) => `<a class="nav-link" href="#${finding.id}"><span class="nav-index">F${String(index + 1).padStart(2, "0")}</span><span class="nav-title">${escapeHtml(finding.title)}</span><span class="nav-severity ${finding.severity}"></span></a>`).join("");
+
+    let activeFilter = "all";
+    const searchInput = document.getElementById("finding-search");
+    const emptyState = document.getElementById("empty-state");
+
+    function applyFilters() {
+      const term = searchInput.value.trim().toLowerCase();
+      let visible = 0;
+      document.querySelectorAll(".finding").forEach(section => {
+        const severityMatch = activeFilter === "all" || section.dataset.severity === activeFilter;
+        const termMatch = !term || section.dataset.search.includes(term);
+        section.hidden = !(severityMatch && termMatch);
+        if (!section.hidden) visible += 1;
+      });
+      emptyState.classList.toggle("visible", visible === 0);
+    }
+
+    document.querySelectorAll(".filter-button").forEach(button => {
+      button.addEventListener("click", () => {
+        activeFilter = button.dataset.filter;
+        document.querySelectorAll(".filter-button").forEach(item => item.setAttribute("aria-pressed", String(item === button)));
+        applyFilters();
+      });
+    });
+
+    searchInput.addEventListener("input", applyFilters);
+
+    const navLinks = [...document.querySelectorAll(".nav-link")];
+    const observer = new IntersectionObserver(entries => {
+      const visibleEntry = entries.filter(entry => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (!visibleEntry) return;
+      navLinks.forEach(link => link.classList.toggle("active", link.getAttribute("href") === `#${visibleEntry.target.id}`));
+    }, { rootMargin: "-20% 0px -68%", threshold: [0.05, 0.2, 0.5] });
+
+    document.querySelectorAll(".finding").forEach(section => observer.observe(section));
+  </script>
+</body>
+</html>
