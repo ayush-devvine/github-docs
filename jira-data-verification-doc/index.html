@@ -29,7 +29,7 @@
 
     * { box-sizing: border-box; }
 
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: auto; }
 
     body {
       margin: 0;
@@ -493,7 +493,8 @@
             <div class="identity-row"><span>Tenant</span><code>TNT_20260514102157973016855861702910004</code></div>
             <div class="identity-row"><span>Organization</span><code>ORG_20260514102157681016855861702910002</code></div>
             <div class="identity-row"><span>Jira site</span><code>devvine.atlassian.net</code></div>
-            <div class="identity-row"><span>Observed</span><code>2026-07-19 IST</code></div>
+            <div class="identity-row"><span>Integration updated</span><code>2026-07-19T14:32:53.026Z</code></div>
+            <div class="identity-row"><span>Live verified</span><code>2026-07-19 21:10 IST</code></div>
           </div>
         </div>
       </section>
@@ -531,6 +532,7 @@
     const GITHUB_INTEGRATION = "INT_20260601135215512016855939452450216";
     const ORG = "ORG_20260514102157681016855861702910002";
     const TENANT = "TNT_20260514102157973016855861702910004";
+    const VERIFIED_AT = "2026-07-19 21:10 IST";
     const DD_ANCHOR = "ANC_000017820108014690a1e0a1e0a00580325";
     const BOARD_ANCHOR = "ANC_000017819488853410a2e0a2e0a005772c0";
 
@@ -539,11 +541,11 @@
     const example = (title, subtitle, graph, rows) => ({ title, subtitle, graph, rows });
 
     const scopedIssues = [
-      { key: "SCRUM-672", jiraId: "15854", summary: "fix(services): handle nullable metric blocks from the Mongo read path", canonical: "ANC_000017844582618970a3d0a3d0a004f108e", shadow: "9b5720f3-4b09-5f2a-9fef-16d896ff398f", pr: "ANC_000017844583069980a3d0a3d0a006d11e9", repo: "devvine-ai/dv-web-frontend", prNumber: "191" },
-      { key: "SCRUM-671", jiraId: "15853", summary: "feat(services): order Services list by ownership (viewer's services first)", canonical: "ANC_000017844568213970a3d0a3d0a004fe0c9", shadow: "1f4cc848-7aa0-536f-94ab-c3e9262cd679", pr: "ANC_000017844568510930a3d0a3d0a006de201", repo: "devvine-ai/dv-web-frontend", prNumber: "190" },
-      { key: "SCRUM-670", jiraId: "15852", summary: "feat(bff): add service-ownership page for Services list ordering", canonical: "ANC_000017844566081710a3d0a3d0a004fd9fc", shadow: "53ab229c-1792-5761-86f9-488e3b3b0b63", pr: "ANC_000017844566396810a3d0a3d0a006ddad3", repo: "devvine-ai/dv-bff", prNumber: "73" },
-      { key: "SCRUM-669", jiraId: "15851", summary: "fix(services): treat empty namespace as no filter so the Services list isn't blank", canonical: "ANC_000017844527365980a3d0a3d0a004f572d", shadow: "08d3d7ce-4986-539e-8221-4ca6a59e26a9", pr: "ANC_000017844527552200a3d0a3d0a006d57b2", repo: "devvine-ai/dv-query-engine", prNumber: "170" },
-      { key: "SCRUM-668", jiraId: "15850", summary: "feat(dashboard): promote Flow efficiency into the Velocity backing-metric tiles", canonical: "ANC_000017844517332690a3d0a3d0a004f3562", shadow: "944b2443-35b4-553d-a96c-25830a89f966", pr: "ANC_000017844517765680a3d0a3d0a006d36d1", repo: "devvine-ai/dv-web-frontend", prNumber: "189" }
+      { key: "SCRUM-672", jiraId: "15854", summary: "fix(services): handle nullable metric blocks from the Mongo read path", processedUpdatedAt: "2026-07-19T10:52:03.718Z", resolverEventAt: "2026-07-19T16:21:00.240+0530", canonical: "ANC_000017844582618970a3d0a3d0a004f108e", shadow: "9b5720f3-4b09-5f2a-9fef-16d896ff398f", pr: "ANC_000017844583069980a3d0a3d0a006d11e9", repo: "devvine-ai/dv-web-frontend", prNumber: "191" },
+      { key: "SCRUM-671", jiraId: "15853", summary: "feat(services): order Services list by ownership (viewer's services first)", processedUpdatedAt: "2026-07-19T10:36:26.986Z", resolverEventAt: "2026-07-19T15:56:44.836+0530", canonical: "ANC_000017844568213970a3d0a3d0a004fe0c9", shadow: "1f4cc848-7aa0-536f-94ab-c3e9262cd679", pr: "ANC_000017844568510930a3d0a3d0a006de201", repo: "devvine-ai/dv-web-frontend", prNumber: "190" },
+      { key: "SCRUM-670", jiraId: "15852", summary: "feat(bff): add service-ownership page for Services list ordering", processedUpdatedAt: "2026-07-19T10:30:02.027Z", resolverEventAt: "2026-07-19T15:53:26.040+0530", canonical: "ANC_000017844566081710a3d0a3d0a004fd9fc", shadow: "53ab229c-1792-5761-86f9-488e3b3b0b63", pr: "ANC_000017844566396810a3d0a3d0a006ddad3", repo: "devvine-ai/dv-bff", prNumber: "73" },
+      { key: "SCRUM-669", jiraId: "15851", summary: "fix(services): treat empty namespace as no filter so the Services list isn't blank", processedUpdatedAt: "2026-07-19T09:20:09.864Z", resolverEventAt: "2026-07-19T14:48:55.284+0530", canonical: "ANC_000017844527365980a3d0a3d0a004f572d", shadow: "08d3d7ce-4986-539e-8221-4ca6a59e26a9", pr: "ANC_000017844527552200a3d0a3d0a006d57b2", repo: "devvine-ai/dv-query-engine", prNumber: "170" },
+      { key: "SCRUM-668", jiraId: "15850", summary: "feat(dashboard): promote Flow efficiency into the Velocity backing-metric tiles", processedUpdatedAt: "2026-07-19T09:20:13.765Z", resolverEventAt: "2026-07-19T14:32:11.768+0530", canonical: "ANC_000017844517332690a3d0a3d0a004f3562", shadow: "944b2443-35b4-553d-a96c-25830a89f966", pr: "ANC_000017844517765680a3d0a3d0a006d36d1", repo: "devvine-ai/dv-web-frontend", prNumber: "189" }
     ];
 
     const classicEvents = [
@@ -571,19 +573,19 @@
     ];
 
     const staleEdges = [
-      { issue: "SCRUM-606", issueAnchor: "ANC_000017841855003250a3e0a3e0a004e15dc", placeholder: "false", edgeId: "172a174d-1d5f-50d0-a2aa-d1a394e979db", sourceField: "pr_title", prAnchor: "ANC_000017841901245460a440a440a006c32c1", prNode: "PR_kwDORUDT2s7yaL4V", repo: "devvine-ai/dv-entity-resolver", number: "160", title: "DO-NOT-MERGE-TEST_PR: Jira data verification : label - feature" },
-      { issue: "SCRUM-606", issueAnchor: "bcfa60c9-ccd8-5d1c-b163-1104d79b5086", placeholder: "true", edgeId: "2f66c14e-1c00-5f34-ae64-dccb5a85b9b8", sourceField: "title", prAnchor: "ANC_000017841901245460a440a440a006c32c1", prNode: "PR_kwDORUDT2s7yaL4V", repo: "devvine-ai/dv-entity-resolver", number: "160", title: "DO-NOT-MERGE-TEST_PR: Jira data verification : label - feature" },
-      { issue: "SCRUM-593", issueAnchor: "ANC_000017841170294480a4f0a4f0a004e1879", placeholder: "false", edgeId: "d9fe8e9f-1ab4-59fe-aac9-c6bed7791306", sourceField: "pr_title", prAnchor: "ANC_000017841153691300a4f0a4f0a006c043c", prNode: "PR_kwDORUDT2s7x_-le", repo: "devvine-ai/dv-entity-resolver", number: "153", title: "SCRUM-596: Fix(lead-time-family)-enable lead-time metrics at user leaf grain with supported rollups" },
-      { issue: "SCRUM-593", issueAnchor: "bef15cf9-9e3c-5ad8-8860-c1f945b0b4e3", placeholder: "true", edgeId: "e348e6d4-4827-5270-938b-2ef2f9e3e0bf", sourceField: "title", prAnchor: "ANC_000017841153691300a4f0a4f0a006c043c", prNode: "PR_kwDORUDT2s7x_-le", repo: "devvine-ai/dv-entity-resolver", number: "153", title: "SCRUM-596: Fix(lead-time-family)-enable lead-time metrics at user leaf grain with supported rollups" },
-      { issue: "SCRUM-529", issueAnchor: "ANC_000017835314091690a190a190a004e011c", placeholder: "false", edgeId: "7ba6e63d-bb61-58d1-b5dc-3f98a48d87b0", sourceField: "pr_title", prAnchor: "ANC_000017837576098130a130a130a00670c99", prNode: "PR_kwDOS3d5Kc7we01w", repo: "devvine-ai/dv-bff", number: "66", title: "feat(overview): expose overviewId + per-card drilldown resolver [SCRUM-574]" }
+      { issue: "SCRUM-606", issueAnchor: "ANC_000017841855003250a3e0a3e0a004e15dc", placeholder: "false", edgeId: "172a174d-1d5f-50d0-a2aa-d1a394e979db", edgeCreatedAt: "2026-07-16T08:22:04.560Z", sourceField: "pr_title", prAnchor: "ANC_000017841901245460a440a440a006c32c1", prNode: "PR_kwDORUDT2s7yaL4V", prUpdatedAt: "2026-07-16T08:49:34.447Z", repo: "devvine-ai/dv-entity-resolver", number: "160", title: "DO-NOT-MERGE-TEST_PR: Jira data verification : label - feature" },
+      { issue: "SCRUM-606", issueAnchor: "bcfa60c9-ccd8-5d1c-b163-1104d79b5086", placeholder: "true", edgeId: "2f66c14e-1c00-5f34-ae64-dccb5a85b9b8", edgeCreatedAt: "2026-07-16T08:22:04.574Z", sourceField: "title", prAnchor: "ANC_000017841901245460a440a440a006c32c1", prNode: "PR_kwDORUDT2s7yaL4V", prUpdatedAt: "2026-07-16T08:49:34.447Z", repo: "devvine-ai/dv-entity-resolver", number: "160", title: "DO-NOT-MERGE-TEST_PR: Jira data verification : label - feature" },
+      { issue: "SCRUM-593", issueAnchor: "ANC_000017841170294480a4f0a4f0a004e1879", placeholder: "false", edgeId: "d9fe8e9f-1ab4-59fe-aac9-c6bed7791306", edgeCreatedAt: "2026-07-15T12:08:10.986Z", sourceField: "pr_title", prAnchor: "ANC_000017841153691300a4f0a4f0a006c043c", prNode: "PR_kwDORUDT2s7x_-le", prUpdatedAt: "2026-07-17T08:43:31.269Z", repo: "devvine-ai/dv-entity-resolver", number: "153", title: "SCRUM-596: Fix(lead-time-family)-enable lead-time metrics at user leaf grain with supported rollups" },
+      { issue: "SCRUM-593", issueAnchor: "bef15cf9-9e3c-5ad8-8860-c1f945b0b4e3", placeholder: "true", edgeId: "e348e6d4-4827-5270-938b-2ef2f9e3e0bf", edgeCreatedAt: "2026-07-15T12:11:40.347Z", sourceField: "title", prAnchor: "ANC_000017841153691300a4f0a4f0a006c043c", prNode: "PR_kwDORUDT2s7x_-le", prUpdatedAt: "2026-07-17T08:43:31.269Z", repo: "devvine-ai/dv-entity-resolver", number: "153", title: "SCRUM-596: Fix(lead-time-family)-enable lead-time metrics at user leaf grain with supported rollups" },
+      { issue: "SCRUM-529", issueAnchor: "ANC_000017835314091690a190a190a004e011c", placeholder: "false", edgeId: "7ba6e63d-bb61-58d1-b5dc-3f98a48d87b0", edgeCreatedAt: "2026-07-11T08:13:29.915Z", sourceField: "pr_title", prAnchor: "ANC_000017837576098130a130a130a00670c99", prNode: "PR_kwDOS3d5Kc7we01w", prUpdatedAt: "2026-07-11T08:44:38.266Z", repo: "devvine-ai/dv-bff", number: "66", title: "feat(overview): expose overviewId + per-card drilldown resolver [SCRUM-574]" }
     ];
 
     const regexRows = [
-      { key: "AES-256", canonical: "ANC_000017819453300830a2e0a2e0a004e2632", shadow: "c8378256-387c-5095-a024-38e4c434a5be", rel: "IMPLEMENTED_BY", target: "ANC_000017827196539420a360a360a00660059", targetType: "PullRequest", targetName: "dv-iaap PR #169" },
-      { key: "HTTP-404", canonical: "ANC_000017819452919410a2e0a2e0a004e246f", shadow: "f9458a7f-733c-5841-a6e9-6f060d5540de", rel: "REFERENCED_IN", target: "ANC_000017819452920360a2e0a2e0a004e2473", targetType: "Commit", targetName: "dv-iaap a6eb0f99" },
-      { key: "ISO-8601", canonical: "ANC_000017819451102230a2e0a2e0a004e1d30", shadow: "eb7d71c9-b419-558b-92a4-edb3f64a004f", rel: "REFERENCED_IN", target: "ANC_000017819469824620a2e0a2e0a004e65e9", targetType: "Commit", targetName: "dv-commons 88eba862" },
-      { key: "RFC-2119", canonical: "ANC_000017819452919200a2e0a2e0a004e246d", shadow: "860c6e46-d48a-55dc-bfb8-015ea3cb383f", rel: "REFERENCED_IN", target: "ANC_000017819452920360a2e0a2e0a004e2473", targetType: "Commit", targetName: "dv-iaap a6eb0f99" },
-      { key: "AVX-512", canonical: "ANC_000017819459183680a2e0a2e0a004e4298", shadow: "64a19a3b-5256-5fdd-9f82-744c23ed4c8f", rel: "REFERENCED_IN", target: "ANC_000017819472023040a2e0a2e0a004e6d1e", targetType: "Commit", targetName: "dv-helm-charts c7dd52aa" }
+      { key: "AES-256", canonical: "ANC_000017819453300830a2e0a2e0a004e2632", canonicalEdge: "66b27516-8209-59be-b0d6-ce0b5219be99", shadow: "c8378256-387c-5095-a024-38e4c434a5be", shadowEdge: "49e672e3-4975-502a-ae24-d914e1c30e3c", edgeCreatedAt: "2026-06-29T07:54:14Z", rel: "IMPLEMENTED_BY", target: "ANC_000017827196539420a360a360a00660059", targetType: "PullRequest", targetName: "dv-iaap PR #169" },
+      { key: "HTTP-404", canonical: "ANC_000017819452919410a2e0a2e0a004e246f", canonicalEdge: "6d1500de-b45f-5d1d-a5bb-a37e69f3d7e8", shadow: "f9458a7f-733c-5841-a6e9-6f060d5540de", shadowEdge: "5674c888-22b4-586f-92d8-df27a27a589e", edgeCreatedAt: "2026-06-20T08:48:12Z", rel: "REFERENCED_IN", target: "ANC_000017819452920360a2e0a2e0a004e2473", targetType: "Commit", targetName: "dv-iaap a6eb0f99" },
+      { key: "ISO-8601", canonical: "ANC_000017819451102230a2e0a2e0a004e1d30", canonicalEdge: "83219550-3afe-572d-94d9-7f16f96c5480", shadow: "eb7d71c9-b419-558b-92a4-edb3f64a004f", shadowEdge: "9c649d14-10c3-5d63-a666-e9702e309716", edgeCreatedAt: "2026-06-20T09:16:22Z", rel: "REFERENCED_IN", target: "ANC_000017819469824620a2e0a2e0a004e65e9", targetType: "Commit", targetName: "dv-commons 88eba862" },
+      { key: "RFC-2119", canonical: "ANC_000017819452919200a2e0a2e0a004e246d", canonicalEdge: "5fd90850-b2ee-52ce-9290-57440000ee4f", shadow: "860c6e46-d48a-55dc-bfb8-015ea3cb383f", shadowEdge: "1ea4059b-8e66-5159-8259-e7b8115558e0", edgeCreatedAt: "2026-06-20T08:48:12Z", rel: "REFERENCED_IN", target: "ANC_000017819452920360a2e0a2e0a004e2473", targetType: "Commit", targetName: "dv-iaap a6eb0f99" },
+      { key: "AVX-512", canonical: "ANC_000017819459183680a2e0a2e0a004e4298", canonicalEdge: "fa99f9d1-0d5c-57f6-926e-bd5a05ddfda7", shadow: "64a19a3b-5256-5fdd-9f82-744c23ed4c8f", shadowEdge: "4ef0e018-5a37-5425-8463-62c27d26e7f5", edgeCreatedAt: "2026-06-20T09:20:02Z", rel: "REFERENCED_IN", target: "ANC_000017819472023040a2e0a2e0a004e6d1e", targetType: "Commit", targetName: "dv-helm-charts c7dd52aa" }
     ];
 
     const invalidPrefixes = [
@@ -670,7 +672,7 @@
         severity: "critical",
         title: "Stitched UUID nodes bypass resolver identity records",
         summary: "Each latest Mongo issue resolves to one canonical ANC anchor with three aliases, while a second UUID node is written to Neo4j with no entity_anchors document and no entity_aliases record.",
-        facts: [["Canonical path", "1 anchor doc + 3 aliases"], ["Stitched path", "0 anchor docs + 0 aliases"], ["Observed form", "Raw UUID placeholder in Neo4j"]],
+        facts: [["Canonical path", "1 anchor doc + 3 aliases"], ["Stitched path", "0 anchor docs + 0 aliases"], ["Live check", VERIFIED_AT]],
         examples: scopedIssues.map(x => example(
           `${x.key} has a resolver-backed ANC node and an unregistered UUID node`,
           x.summary,
@@ -683,7 +685,7 @@
             ],
             edges: [edge("mongo", "resolver", "resolved", "dashed"), edge("resolver", "canonical", "anchor_id", "dashed"), edge("mongo", "shadow", "stitched UUID", "dashed bad")]
           },
-          [["Jira integration ID", LATEST], ["Mongo processed records", "1"], ["Canonical anchor", x.canonical], ["Canonical entity_anchors docs", "1"], ["Canonical entity_aliases docs", "3"], ["Shadow UUID anchor", x.shadow], ["Shadow entity_anchors docs", "0"], ["Shadow entity_aliases docs", "0"]]
+          [["Jira integration ID", LATEST], ["Mongo processed records", "1"], ["Mongo processed updatedAt", x.processedUpdatedAt], ["Resolver event_updated_at", x.resolverEventAt], ["Canonical anchor", x.canonical], ["Canonical entity_anchors docs", "1"], ["Canonical entity_aliases docs", "3"], ["Shadow UUID anchor", x.shadow], ["Shadow entity_anchors docs", "0"], ["Shadow entity_aliases docs", "0"], ["Live verified at", VERIFIED_AT]]
         ))
       },
       {
@@ -691,7 +693,7 @@
         severity: "critical",
         title: "One Jira issue key materializes as two graph nodes",
         summary: "The latest processed collection contains exactly one record for each sampled key. Neo4j contains both a canonical ANC issue node and a placeholder UUID issue node. Across the graph, 251 keys are duplicated and account for 252 extra nodes.",
-        facts: [["Latest Mongo", "1 processed record per key"], ["Neo4j", "Canonical ANC + placeholder UUID"], ["Graph total", "251 duplicated keys"]],
+        facts: [["Latest Mongo", "1 processed record per key"], ["Neo4j", "Canonical ANC + placeholder UUID"], ["Live graph total", "251 keys / 252 extra nodes"]],
         examples: scopedIssues.map(x => example(
           `${x.key} is duplicated in Neo4j`,
           `jiraId ${x.jiraId}; one Mongo record; two graph nodes`,
@@ -703,7 +705,7 @@
             ],
             edges: [edge("mongo", "canonical", "key + jiraId", "dashed"), edge("mongo", "shadow", "same key", "dashed bad")]
           },
-          [["Jira integration ID", LATEST], ["Mongo jiraId", x.jiraId], ["Mongo document count", "1"], ["Canonical anchor", x.canonical], ["Canonical resolved_by_resolver", "true"], ["Placeholder anchor", x.shadow], ["Placeholder flag", "true"], ["Graph nodes for key", "2"]]
+          [["Jira integration ID", LATEST], ["Mongo jiraId", x.jiraId], ["Mongo document count", "1"], ["Mongo processed updatedAt", x.processedUpdatedAt], ["Canonical anchor", x.canonical], ["Canonical resolved_by_resolver", "true"], ["Placeholder anchor", x.shadow], ["Placeholder Jira ID", "null"], ["Placeholder resolved_by_resolver", "null"], ["Graph nodes for key", "2"], ["Live verified at", VERIFIED_AT]]
         ))
       },
       {
@@ -711,7 +713,7 @@
         severity: "critical",
         title: "PR title updates leave stale IMPLEMENTED_BY edges",
         summary: "The current PullRequest titles no longer contain the old Jira key, but the old title-derived IMPLEMENTED_BY relationships remain. Canonical and placeholder issue paths create separate edge native IDs to the same PR endpoint.",
-        facts: [["Relationship", "JIRA_ISSUE -IMPLEMENTED_BY-> PullRequest"], ["Evidence", "Current Mongo PR title differs from stored Jira edge key"], ["Edge identity", "Separate native_id per issue anchor"]],
+        facts: [["Relationship", "JIRA_ISSUE -IMPLEMENTED_BY-> PullRequest"], ["Evidence", "Current PR title excludes stored Jira key"], ["Live check", VERIFIED_AT]],
         examples: staleEdges.map(x => example(
           `${x.issue} still IMPLEMENTED_BY ${x.repo}#${x.number}`,
           `Current title: ${x.title}`,
@@ -722,7 +724,7 @@
             ],
             edges: [edge("issue", "pr", "IMPLEMENTED_BY", "bad")]
           },
-          [["Latest Jira integration ID", LATEST], ["GitHub integration ID", GITHUB_INTEGRATION], ["Issue key", x.issue], ["Issue anchor", x.issueAnchor], ["Issue placeholder", x.placeholder], ["Relationship native_id", x.edgeId], ["Relationship source_field", x.sourceField], ["PR anchor", x.prAnchor], ["PR node_id", x.prNode], ["Current PR", `${x.repo}#${x.number}`], ["Current Mongo PR title", x.title]]
+          [["Latest Jira integration ID", LATEST], ["GitHub integration ID", GITHUB_INTEGRATION], ["Issue key", x.issue], ["Issue anchor", x.issueAnchor], ["Issue placeholder", x.placeholder], ["Relationship native_id", x.edgeId], ["Relationship created_at", x.edgeCreatedAt], ["Relationship source_field", x.sourceField], ["PR anchor", x.prAnchor], ["PR node_id", x.prNode], ["Current PR", `${x.repo}#${x.number}`], ["Current Mongo PR title", x.title], ["Mongo PR updatedAt", x.prUpdatedAt], ["Live verified at", VERIFIED_AT]]
         ))
       },
       {
@@ -730,7 +732,7 @@
         severity: "critical",
         title: "Jira key regex creates false-positive issue nodes and relationships",
         summary: "Technical tokens that are not Jira issues become canonical resolver anchors and UUID placeholders, then receive graph relationships to commits or pull requests. None exists as an issue in the latest Jira processed collection.",
-        facts: [["Latest Jira Mongo", "0 issue documents for all five keys"], ["Resolver", "GITHUB jira_issue_key hard signal"], ["Neo4j", "Canonical + placeholder with real outgoing edges"]],
+        facts: [["Latest Jira Mongo", "0 documents for all five keys"], ["Neo4j", "2 issue nodes + real outgoing edges"], ["Live check", VERIFIED_AT]],
         examples: regexRows.map(x => example(
           `${x.key} parsed as a Jira issue`,
           `Both issue nodes connect to ${x.targetName}`,
@@ -742,7 +744,7 @@
             ],
             edges: [edge("canonical", "target", x.rel, "bad"), edge("shadow", "target", x.rel, "bad")]
           },
-          [["Latest Jira integration ID", LATEST], ["Latest Jira issue documents", "0"], ["False-positive key", x.key], ["Canonical resolver anchor", x.canonical], ["Canonical soft signals", "[]"], ["Placeholder UUID anchor", x.shadow], ["Neo4j relationship", `(${x.key})-[:${x.rel}]->(${x.targetType})`], ["Target anchor", x.target], ["Target", x.targetName], ["Graph integration_id", "null"]]
+          [["Latest Jira integration ID", LATEST], ["Latest Jira issue documents", "0"], ["False-positive key", x.key], ["Canonical resolver anchor", x.canonical], ["Canonical relationship native_id", x.canonicalEdge], ["Placeholder UUID anchor", x.shadow], ["Placeholder relationship native_id", x.shadowEdge], ["Relationship created_at", x.edgeCreatedAt], ["Neo4j relationship", `(${x.key})-[:${x.rel}]->(${x.targetType})`], ["Target anchor", x.target], ["Target", x.targetName], ["Graph integration_id", "null"], ["Live verified at", VERIFIED_AT]]
         ))
       },
       {
@@ -770,7 +772,7 @@
         severity: "critical",
         title: "Jira integration identity is not propagated into Neo4j",
         summary: "The latest Mongo records carry the exact integration ID, but both canonical and placeholder graph nodes have integration_id=null. This is true for all 1,148 Jira issue nodes, preventing reliable per-integration graph verification.",
-        facts: [["Mongo property", `integrationId=${LATEST}`], ["Graph property", "integration_id=null"], ["Affected", "1,148 of 1,148 Jira issue nodes"]],
+        facts: [["Mongo property", `integrationId=${LATEST}`], ["Graph property", "integration_id=null"], ["Live affected", "1,148 of 1,148 issue nodes"]],
         examples: scopedIssues.map(x => example(
           `${x.key} loses integration identity at graph projection`,
           `Mongo ${LATEST}; Neo4j null`,
@@ -782,7 +784,7 @@
             ],
             edges: [edge("mongo", "canonical", "same jiraId/key", "dashed bad"), edge("mongo", "shadow", "same key", "dashed bad")]
           },
-          [["Mongo collection", "integrations.jira_processed_events"], ["Mongo integrationId", LATEST], ["Mongo jiraId", x.jiraId], ["Issue key", x.key], ["Canonical anchor", x.canonical], ["Canonical integration_id", "null"], ["Placeholder anchor", x.shadow], ["Placeholder integration_id", "null"]]
+          [["Mongo collection", "integrations.jira_processed_events"], ["Mongo integrationId", LATEST], ["Mongo jiraId", x.jiraId], ["Mongo processed updatedAt", x.processedUpdatedAt], ["Issue key", x.key], ["Canonical anchor", x.canonical], ["Canonical integration_id", "null"], ["Placeholder anchor", x.shadow], ["Placeholder integration_id", "null"], ["Live verified at", VERIFIED_AT]]
         ))
       },
       {
@@ -790,7 +792,7 @@
         severity: "critical",
         title: "Entities with empty hard and soft signals still reach Neo4j",
         summary: "Resolver MongoDB contains 31 active Jira anchors with hardSignals=[] and softSignals=[]. These five diverse anchors are also present in Neo4j with resolved_by_resolver=true, missing domain identity, no integration ID, and degree zero.",
-        facts: [["Resolver total", "31 empty-signal Jira anchors"], ["Mongo state", "active=true"], ["Neo4j state", "resolved_by_resolver=true; degree=0"]],
+        facts: [["Resolver total", "31 active empty-signal anchors"], ["Type split", "17 group / 7 sprint / 3 project / 3 issue / 1 board"], ["Live check", VERIFIED_AT]],
         examples: emptySignals.map(x => example(
           `${x.type} persisted without identity signals`,
           x.domain,
@@ -801,7 +803,7 @@
             ],
             edges: [edge("resolver", "graph", "same anchor_id", "dashed bad")]
           },
-          [["Resolver Mongo collection", "entity-resolver.entity_anchors"], ["Anchor ID", x.anchor], ["Entity type", x.type], ["Identity key", "null"], ["Hard signals", "[]"], ["Soft signals", "[]"], ["Mongo active", "true"], ["Neo4j identifier", x.identifier], ["Neo4j domain identity", x.domain], ["Neo4j resolved_by_resolver", "true"], ["Neo4j integration_id", "null"], ["Neo4j degree", "0"]]
+          [["Resolver Mongo collection", "entity-resolver.entity_anchors"], ["Anchor ID", x.anchor], ["Entity type", x.type], ["Identity key", "null"], ["Hard signals", "[]"], ["Soft signals", "[]"], ["Mongo active", "true"], ["Neo4j identifier", x.identifier], ["Neo4j domain identity", x.domain], ["Neo4j resolved_by_resolver", "true"], ["Neo4j integration_id", "null"], ["Neo4j degree", "0"], ["Live verified at", VERIFIED_AT]]
         ))
       }
     ];
@@ -879,6 +881,21 @@
 
     document.getElementById("findings").innerHTML = findings.map(renderFinding).join("");
     document.getElementById("finding-nav").innerHTML = findings.map((finding, index) => `<a class="nav-link" href="#${finding.id}"><span class="nav-index">F${String(index + 1).padStart(2, "0")}</span><span class="nav-title">${escapeHtml(finding.title)}</span><span class="nav-severity ${finding.severity}"></span></a>`).join("");
+
+    function revealHashTarget() {
+      if (!location.hash) return;
+      let targetId;
+      try {
+        targetId = decodeURIComponent(location.hash.slice(1));
+      } catch {
+        return;
+      }
+      const target = document.getElementById(targetId);
+      if (target) target.scrollIntoView({ block: "start", behavior: "auto" });
+    }
+
+    requestAnimationFrame(() => requestAnimationFrame(revealHashTarget));
+    window.addEventListener("hashchange", revealHashTarget);
 
     let activeFilter = "all";
     const searchInput = document.getElementById("finding-search");
