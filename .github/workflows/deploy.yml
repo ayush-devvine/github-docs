@@ -14,10 +14,6 @@ concurrency:
   group: pages
   cancel-in-progress: true
 
-env:
-  SOURCE_DIR: jira-data-verification-doc
-  PUBLIC_PATH: jira-data-verification-doc
-
 jobs:
   deploy:
     environment:
@@ -32,14 +28,9 @@ jobs:
 
       - uses: actions/configure-pages@v5
 
-      - name: Prepare selected documentation
-        run: |
-          mkdir -p "_site/${PUBLIC_PATH}"
-          cp -R "${SOURCE_DIR}/." "_site/${PUBLIC_PATH}/"
-
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: ./_site
+          path: .
 
       - id: deployment
         uses: actions/deploy-pages@v4
